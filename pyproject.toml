@@ -88,6 +88,15 @@ typeCheckingMode = "strict"
 reportMissingImports = "error"
 reportMissingTypeStubs = false
 
+# Tests use inline dict literals extensively; pyright strict's "partially
+# unknown" diagnostics on those make tests illegible. Production stays strict.
+[[tool.pyright.executionEnvironments]]
+root = "tests"
+reportUnknownVariableType = "none"
+reportUnknownArgumentType = "none"
+reportUnknownMemberType = "none"
+reportUnknownParameterType = "none"
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 asyncio_mode = "auto"

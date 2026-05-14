@@ -16,9 +16,10 @@ from starlette.responses import JSONResponse, Response
 from reel.cassette.store import Cassette
 from reel.proxy.config import ProxyConfig
 from reel.proxy.modes.record import record
+from reel.proxy.modes.replay import replay
 from reel.proxy.router import Upstream
 
-__all__ = ["dispatch", "record"]
+__all__ = ["dispatch", "record", "replay"]
 
 
 def _no_cassette_error(mode: str) -> JSONResponse:
@@ -53,7 +54,12 @@ async def dispatch(request: Request, upstream: Upstream) -> Response:
             return _no_cassette_error("record")
         return await record(request, http_client, upstream, cassette)
 
-    if config.mode in ("replay", "auto"):
+    if config.mode == "replay":
+        if cassette is None:
+            return _no_cassette_error("replay")
+        return await replay(request, cassette)
+
+    if config.mode == "auto":
         return _not_implemented(config.mode)
 
     # Unreachable — ProxyConfig validates mode at construction.
