@@ -26,25 +26,25 @@ def test_redacts_secret_in_response_headers() -> None:
     entry = _entry_with(
         CassetteResponse(
             status=200,
-            headers={"x-debug": "leaked Bearer sk-AAAAAAAAAAAAAAAAAAAA"},
+            headers={"x-debug": "leaked Bearer sk-FAKE_FIXTURE_TEST_NOT_REAL"},
             body=None,
         )
     )
     cleaned = redact_entry(entry)
-    assert "sk-AAAAAAAAAAAAAAAAAAAA" not in cleaned.response.headers["x-debug"]
+    assert "sk-FAKE_FIXTURE_TEST_NOT_REAL" not in cleaned.response.headers["x-debug"]
 
 
 def test_redacts_nested_json_body() -> None:
     body = {
         "id": "msg",
         "choices": [
-            {"message": {"content": "Your key is sk-AAAAAAAAAAAAAAAAAAAA"}},
+            {"message": {"content": "Your key is sk-FAKE_FIXTURE_TEST_NOT_REAL"}},
         ],
         "metadata": {"contact": "user@example.com"},
     }
     cleaned = redact_entry(_entry_with(CassetteResponse(status=200, headers={}, body=body)))
     serialized = repr(cleaned.response.body)
-    assert "sk-AAAAAAAAAAAAAAAAAAAA" not in serialized
+    assert "sk-FAKE_FIXTURE_TEST_NOT_REAL" not in serialized
     assert "user@example.com" not in serialized
     assert "[redacted:openai-key]" in serialized
     assert "[redacted:email]" in serialized
@@ -69,14 +69,14 @@ def test_redacts_stream_chunks() -> None:
 
 
 def test_scrub_pii_false_keeps_pii_but_still_scrubs_secrets() -> None:
-    body = {"text": "ping alice@example.com with key sk-AAAAAAAAAAAAAAAAAAAA"}
+    body = {"text": "ping alice@example.com with key sk-FAKE_FIXTURE_TEST_NOT_REAL"}
     cleaned = redact_entry(
         _entry_with(CassetteResponse(status=200, headers={}, body=body)),
         scrub_pii=False,
     )
     serialized = repr(cleaned.response.body)
     assert "alice@example.com" in serialized
-    assert "sk-AAAAAAAAAAAAAAAAAAAA" not in serialized
+    assert "sk-FAKE_FIXTURE_TEST_NOT_REAL" not in serialized
 
 
 def test_safe_entry_unchanged() -> None:

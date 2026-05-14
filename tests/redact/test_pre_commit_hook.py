@@ -63,7 +63,7 @@ def test_passes_when_jsonl_has_no_secrets(repo: Path) -> None:
 
 
 def test_refuses_jsonl_with_openai_key(repo: Path) -> None:
-    (repo / "tainted.jsonl").write_text('{"x":"leaked sk-AAAAAAAAAAAAAAAAAAAA in body"}\n')
+    (repo / "tainted.jsonl").write_text('{"x":"leaked sk-FAKE_FIXTURE_TEST_NOT_REAL in body"}\n')
     _git(repo, "add", "tainted.jsonl")
     r = _run_hook(repo)
     assert r.returncode == 1
@@ -85,7 +85,7 @@ def test_only_inspects_staged_content_not_working_tree(repo: Path) -> None:
     _git(repo, "add", "tape.jsonl")
 
     # Now write a secret to the working tree (NOT staged).
-    path.write_text('{"x":"sk-AAAAAAAAAAAAAAAAAAAA"}\n')
+    path.write_text('{"x":"sk-FAKE_FIXTURE_TEST_NOT_REAL"}\n')
 
     r = _run_hook(repo)
     # Hook sees the staged content (clean) → passes.

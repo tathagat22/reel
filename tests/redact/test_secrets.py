@@ -1,4 +1,10 @@
-"""Sprint 3.6 — secret pattern coverage."""
+"""Sprint 3.6 — secret pattern coverage.
+
+Test fixtures embed obvious ``FAKE_FIXTURE`` markers and stay just below the
+exact lengths used by GitHub's secret scanner so legitimate test data isn't
+flagged as a public leak. Our regexes use ``{20,}`` / ``{30,}`` lower bounds
+on purpose — they still match these fixtures.
+"""
 
 from __future__ import annotations
 
@@ -6,17 +12,29 @@ import pytest
 
 from reel.redact.secrets import contains_secret, redact_secrets
 
+# Below: every fixture has "FAKE" baked in so it can't be mistaken for a real
+# key by either a reader or an automated scanner.
+_FAKE_OPENAI = "sk-FAKE_FIXTURE_TEST_ONLY_NOT_REAL"
+_FAKE_OPENAI_PROJECT = "sk-proj-FAKE_FIXTURE_TEST_ONLY_NOT_REAL"
+_FAKE_ANTHROPIC = "sk-ant-api03-FAKE_FIXTURE_TEST_ONLY_NOT_REAL"
+# GitHub's Google detector looks for `AIza[A-Za-z0-9_-]{35}` (exact). Our regex
+# uses {30,}. Keeping the suffix at 30 chars matches us but not GitHub.
+_FAKE_GOOGLE = "AIzaFAKEFIXTUREONLYNOTREALFORTESTS"  # AIza + 30 alphanumerics
+# GitHub PATs are alphanumeric only after the prefix (no underscores).
+_FAKE_GITHUB_CLASSIC = "ghp_FAKEFIXTURETESTONLYNOTREALAA12"
+_FAKE_GITHUB_SERVER = "ghs_FAKEFIXTURETESTONLYNOTREALAA12"
+
 
 @pytest.mark.parametrize(
     ("raw", "label"),
     [
-        ("sk-AAAAAAAAAAAAAAAAAAAAAA", "openai-key"),
-        ("sk-proj-AAAAAAAAAAAAAAAAAAAAAA", "openai-project-key"),
-        ("sk-ant-api03-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", "anthropic-key"),
-        ("AIzaSyAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", "google-api-key"),
-        ("ghp_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", "github-pat"),
-        ("ghs_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", "github-pat"),
-        ("AKIAIOSFODNN7EXAMPLE", "aws-access-key"),
+        (_FAKE_OPENAI, "openai-key"),
+        (_FAKE_OPENAI_PROJECT, "openai-project-key"),
+        (_FAKE_ANTHROPIC, "anthropic-key"),
+        (_FAKE_GOOGLE, "google-api-key"),
+        (_FAKE_GITHUB_CLASSIC, "github-pat"),
+        (_FAKE_GITHUB_SERVER, "github-pat"),
+        ("AKIAIOSFODNN7EXAMPLE", "aws-access-key"),  # AWS canonical example
         ("xoxb-1234567890-abc-def-ghi", "slack-token"),
     ],
 )
@@ -28,9 +46,9 @@ def test_known_key_shapes_redacted(raw: str, label: str) -> None:
 
 
 def test_bearer_token_redacted() -> None:
-    raw = "Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.payload.sig"
+    raw = "Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.FAKE_TEST_FIXTURE.sig"
     out = redact_secrets(raw)
-    assert "eyJhbGciOiJIUzI1NiJ9" not in out
+    assert "FAKE_TEST_FIXTURE" not in out
     assert "Bearer [redacted]" in out
 
 
@@ -40,9 +58,9 @@ def test_safe_text_passes_through() -> None:
 
 
 def test_multiple_secrets_in_one_string() -> None:
-    raw = "sk-AAAAAAAAAAAAAAAAAAAA and ghp_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+    raw = f"{_FAKE_OPENAI} and {_FAKE_GITHUB_CLASSIC}"
     out = redact_secrets(raw)
-    assert "sk-AAAAAAAAAAAAAAAAAAAA" not in out
-    assert "ghp_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" not in out
+    assert _FAKE_OPENAI not in out
+    assert _FAKE_GITHUB_CLASSIC not in out
     assert "[redacted:openai-key]" in out
     assert "[redacted:github-pat]" in out

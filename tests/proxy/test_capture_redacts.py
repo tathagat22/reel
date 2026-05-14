@@ -32,7 +32,9 @@ def test_recorded_response_secret_is_scrubbed(tmp_path: Path) -> None:
         return_value=httpx.Response(
             200,
             json={
-                "choices": [{"message": {"content": "your key is sk-AAAAAAAAAAAAAAAAAAAA, sorry"}}]
+                "choices": [
+                    {"message": {"content": "your key is sk-FAKE_FIXTURE_TEST_NOT_REAL, sorry"}}
+                ]
             },
         )
     )
@@ -46,10 +48,10 @@ def test_recorded_response_secret_is_scrubbed(tmp_path: Path) -> None:
     assert r.status_code == 200
     # The client got the original (unredacted) upstream content — only the
     # cassette is scrubbed.
-    assert "sk-AAAAAAAAAAAAAAAAAAAA" in r.text
+    assert "sk-FAKE_FIXTURE_TEST_NOT_REAL" in r.text
 
     raw = cassette_path.read_text()
-    assert "sk-AAAAAAAAAAAAAAAAAAAA" not in raw
+    assert "sk-FAKE_FIXTURE_TEST_NOT_REAL" not in raw
     assert "[redacted:openai-key]" in raw
 
 
@@ -84,21 +86,21 @@ def test_recorded_response_keeps_email_when_pii_opt_out(tmp_path: Path) -> None:
 def test_secrets_always_scrubbed_even_with_pii_opt_out(tmp_path: Path) -> None:
     """`redact_pii=False` opts out of PII only — secrets are always scrubbed."""
     respx.post(f"{UPSTREAM}/v1/chat/completions").mock(
-        return_value=httpx.Response(200, json={"key": "sk-AAAAAAAAAAAAAAAAAAAA"})
+        return_value=httpx.Response(200, json={"key": "sk-FAKE_FIXTURE_TEST_NOT_REAL"})
     )
     cassette_path = tmp_path / "tape.jsonl"
     with _proxy("record", cassette_path, redact_pii=False) as client:
         client.post("/v1/chat/completions", json={"model": "gpt-5", "messages": []})
 
     raw = cassette_path.read_text()
-    assert "sk-AAAAAAAAAAAAAAAAAAAA" not in raw
+    assert "sk-FAKE_FIXTURE_TEST_NOT_REAL" not in raw
 
 
 @respx.mock
 def test_replay_serves_redacted_content(tmp_path: Path) -> None:
     """After record + replay, the client sees the redacted (cassette-stored) content."""
     respx.post(f"{UPSTREAM}/v1/chat/completions").mock(
-        return_value=httpx.Response(200, json={"text": "sk-AAAAAAAAAAAAAAAAAAAA"})
+        return_value=httpx.Response(200, json={"text": "sk-FAKE_FIXTURE_TEST_NOT_REAL"})
     )
     cassette_path = tmp_path / "tape.jsonl"
     payload = {"model": "gpt-5", "messages": []}

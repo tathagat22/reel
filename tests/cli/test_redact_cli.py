@@ -31,7 +31,7 @@ def _entry_line(body: object) -> str:
         response=CassetteResponse(
             status=200,
             headers={"x-debug": "Bearer eyJabc.payload.sig"},
-            body={"text": "secret sk-AAAAAAAAAAAAAAAAAAAA leak", "contact": "x@example.com"},
+            body={"text": "secret sk-FAKE_FIXTURE_TEST_NOT_REAL leak", "contact": "x@example.com"},
         ),
     )
     return entry.model_dump_json()
@@ -60,7 +60,7 @@ def test_redact_scrubs_in_place(runner: CliRunner, tmp_path: Path) -> None:
     assert result.exit_code == 0, result.stdout
 
     raw = path.read_text()
-    assert "sk-AAAAAAAAAAAAAAAAAAAA" not in raw
+    assert "sk-FAKE_FIXTURE_TEST_NOT_REAL" not in raw
     assert "x@example.com" not in raw
     assert "[redacted:openai-key]" in raw
     assert "[redacted:email]" in raw
@@ -75,7 +75,7 @@ def test_redact_keeps_pii_with_keep_pii_flag(runner: CliRunner, tmp_path: Path) 
 
     raw = path.read_text()
     # Secrets always scrubbed even with --keep-pii
-    assert "sk-AAAAAAAAAAAAAAAAAAAA" not in raw
+    assert "sk-FAKE_FIXTURE_TEST_NOT_REAL" not in raw
     # PII preserved
     assert "x@example.com" in raw
 
@@ -103,7 +103,7 @@ def test_redact_writes_to_output_path(runner: CliRunner, tmp_path: Path) -> None
     # Original untouched, dest scrubbed.
     assert src.read_text() == original
     assert dst.exists()
-    assert "sk-AAAAAAAAAAAAAAAAAAAA" not in dst.read_text()
+    assert "sk-FAKE_FIXTURE_TEST_NOT_REAL" not in dst.read_text()
 
 
 def test_redact_preserves_meta_line(runner: CliRunner, tmp_path: Path) -> None:
