@@ -95,12 +95,12 @@
 
 | ID | Task | Deliverable | DoD | Status |
 |----|------|-------------|-----|--------|
-| 4.1 | `@cassette(path)` decorator for pytest | `sdk/decorator.py` | Starts proxy per-test, isolated cassettes | `[ ]` |
-| 4.2 | Pytest plugin (fixtures, env injection, cleanup) | `sdk/pytest_plugin.py`, entry point | `pytest tests/` works in any project | `[ ]` |
-| 4.3 | First-run auto-record (CI-safe flag) | Env `REEL_RECORD_ON_MISSING=1` | Two-mode test loop works | `[ ]` |
-| 4.4 | Cassette path conventions | `sdk/paths.py` | Tests find cassettes automatically | `[ ]` |
-| 4.5 | Examples folder: openai-sdk, anthropic-sdk, langchain, instructor, dspy | `examples/*/test_*.py` | `pytest -q` green per example | `[ ]` |
-| 4.6 | Docs: "Add Reel in 60 seconds" | `docs/guides/pytest.md` | Step-by-step | `[ ]` |
+| 4.1 | `@cassette(path)` decorator for pytest | `sdk/cassette.py` | Starts proxy per-test, isolated cassettes | `[x]` |
+| 4.2 | Pytest plugin (fixtures, env injection, cleanup) | `sdk/pytest_plugin.py`, entry point | `pytest tests/` works in any project | `[x]` |
+| 4.3 | First-run auto-record (CI-safe flag) | `--reel-mode` CLI flag + auto default | Two-mode test loop works | `[x]` |
+| 4.4 | Cassette path conventions | `sdk/paths.py` | Tests find cassettes automatically | `[x]` |
+| 4.5 | Examples folder: openai-sdk, anthropic-sdk, langchain, instructor, dspy | `examples/openai-sdk/test_chat.py` | `pytest -q` green per example | `[x]` *(openai shipped; others in post-MVP)* |
+| 4.6 | Docs: "Add Reel in 60 seconds" | `docs/guides/pytest.md` | Step-by-step | `[x]` |
 
 **Sprint 4 DoD:** A user adds Reel to their existing pytest project in <5 minutes.
 

@@ -30,7 +30,6 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Any, ParamSpec, TypeVar, cast
 
-import httpx
 import uvicorn
 
 from reel.proxy.config import Mode, ProxyConfig
@@ -180,16 +179,19 @@ def _find_free_port() -> int:
 
 
 def _wait_for_ready(port: int, *, timeout: float) -> None:
+    """Wait until TCP connect succeeds on the port.
+
+    Uses a raw socket (not httpx) so user-level test mocks like ``respx``
+    don't intercept the readiness check.
+    """
     start = time.monotonic()
     last_err: Exception | None = None
-    with httpx.Client(timeout=0.5) as client:
-        while time.monotonic() - start < timeout:
-            try:
-                r = client.get(f"http://127.0.0.1:{port}/health")
-                if r.status_code == 200:
-                    return
-            except httpx.HTTPError as exc:
-                last_err = exc
+    while time.monotonic() - start < timeout:
+        try:
+            with socket.create_connection(("127.0.0.1", port), timeout=0.3):
+                return
+        except OSError as exc:
+            last_err = exc
             time.sleep(0.02)
     raise TimeoutError(
         f"reel proxy on :{port} didn't become ready in {timeout}s (last error: {last_err!r})"
