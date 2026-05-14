@@ -35,11 +35,15 @@ async def replay(request: Request, cassette: Cassette) -> Response:
             status_code=404,
         )
 
-    return _response_from_entry(entry)
+    return response_from_entry(entry)
 
 
-def _response_from_entry(entry: CassetteEntry) -> Response:
-    """Materialize a stored entry back into a Starlette Response."""
+def response_from_entry(entry: CassetteEntry) -> Response:
+    """Materialize a stored entry back into a Starlette Response.
+
+    Shared between :mod:`reel.proxy.modes.replay` and
+    :mod:`reel.proxy.modes.auto`.
+    """
     body = serialize_from_storage(entry.response.body)
     return Response(
         content=body,

@@ -15,11 +15,12 @@ from starlette.responses import JSONResponse, Response
 
 from reel.cassette.store import Cassette
 from reel.proxy.config import ProxyConfig
+from reel.proxy.modes.auto import auto
 from reel.proxy.modes.record import record
 from reel.proxy.modes.replay import replay
 from reel.proxy.router import Upstream
 
-__all__ = ["dispatch", "record", "replay"]
+__all__ = ["auto", "dispatch", "record", "replay"]
 
 
 def _no_cassette_error(mode: str) -> JSONResponse:
@@ -29,16 +30,6 @@ def _no_cassette_error(mode: str) -> JSONResponse:
             "hint": "Pass --cassette <path> or set REEL_CASSETTE before starting the proxy.",
         },
         status_code=400,
-    )
-
-
-def _not_implemented(mode: str) -> JSONResponse:
-    return JSONResponse(
-        {
-            "error": f"reel: {mode!r} mode is not implemented yet",
-            "hint": "record mode lands in Sprint 1.6; replay in 1.7; auto in 1.8.",
-        },
-        status_code=501,
     )
 
 
@@ -60,7 +51,9 @@ async def dispatch(request: Request, upstream: Upstream) -> Response:
         return await replay(request, cassette)
 
     if config.mode == "auto":
-        return _not_implemented(config.mode)
+        if cassette is None:
+            return _no_cassette_error("auto")
+        return await auto(request, http_client, upstream, cassette)
 
     # Unreachable — ProxyConfig validates mode at construction.
     return JSONResponse({"error": f"reel: unknown mode {config.mode!r}"}, status_code=500)
