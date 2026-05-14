@@ -33,17 +33,17 @@
 
 | ID | Task | Deliverable | DoD | Status |
 |----|------|-------------|-----|--------|
-| 1.1 | Bare async HTTP proxy on `:7878` using starlette + httpx | `proxy/server.py` | `curl localhost:7878/health` → 200 | `[ ]` |
-| 1.2 | Upstream routing config (env-driven) | `proxy/router.py` | Unknown path 404s cleanly | `[ ]` |
-| 1.3 | OpenAI adapter — request fingerprint (model + messages + tools hash) | `adapters/openai.py` | Hash stable on whitespace, sensitive on content | `[ ]` |
-| 1.4 | Cassette writer (JSONL append) per schema | `cassette/writer.py` | Round-trip write → read works | `[ ]` |
-| 1.5 | Cassette reader + exact-match lookup | `cassette/reader.py`, `cassette/matcher.py` | Two identical requests match | `[ ]` |
-| 1.6 | `record` mode: forward + capture + write | `proxy/modes/record.py` | E2E: mock upstream call recorded | `[ ]` |
-| 1.7 | `replay` mode: serve from cassette only, 404 on miss | `proxy/modes/replay.py` | Recorded request replays without network | `[ ]` |
-| 1.8 | `auto` mode: replay if match, else record | `proxy/modes/auto.py` | Mode switching mid-session works | `[ ]` |
-| 1.9 | CLI: `reel record / replay / auto` | `cli/main.py` | `reel --help` shows commands | `[ ]` |
-| 1.10 | E2E tests using mock upstream (no real API in CI) | `tests/e2e/test_openai_basic.py` | CI passes without API key | `[ ]` |
-| 1.11 | Quickstart in README: 4 commands → working replay | README updated | New user runs it in <2 min | `[ ]` |
+| 1.1 | Bare async HTTP proxy on `:7878` using starlette + httpx | `proxy/server.py` | `curl localhost:7878/health` → 200 | `[x]` |
+| 1.2 | Upstream routing config (env-driven) | `proxy/router.py` | Unknown path 404s cleanly | `[x]` |
+| 1.3 | OpenAI adapter — request fingerprint (model + messages + tools hash) | `adapters/openai.py` | Hash stable on whitespace, sensitive on content | `[x]` |
+| 1.4 | Cassette writer (JSONL append) per schema | `cassette/writer.py` | Round-trip write → read works | `[x]` |
+| 1.5 | Cassette reader + exact-match lookup | `cassette/reader.py`, `cassette/matcher.py` | Two identical requests match | `[x]` |
+| 1.6 | `record` mode: forward + capture + write | `proxy/modes/record.py` | E2E: mock upstream call recorded | `[x]` |
+| 1.7 | `replay` mode: serve from cassette only, 404 on miss | `proxy/modes/replay.py` | Recorded request replays without network | `[x]` |
+| 1.8 | `auto` mode: replay if match, else record | `proxy/modes/auto.py` | Mode switching mid-session works | `[x]` |
+| 1.9 | CLI: `reel record / replay / auto` | `cli/main.py` | `reel --help` shows commands | `[x]` |
+| 1.10 | E2E tests using mock upstream (no real API in CI) | `tests/e2e/test_openai_basic.py` | CI passes without API key | `[x]` |
+| 1.11 | Quickstart in README: 4 commands → working replay | README updated | New user runs it in <2 min | `[x]` |
 
 **Sprint 1 DoD:** `pipx install reel && reel auto` works against any OpenAI SDK pointed at `localhost:7878`.
 
