@@ -13,17 +13,17 @@ from collections.abc import AsyncIterator
 from starlette.requests import Request
 from starlette.responses import JSONResponse, Response, StreamingResponse
 
-from reel.adapters.openai import fingerprint as openai_fingerprint
 from reel.cassette.body import serialize_from_storage, serialize_sse_data
 from reel.cassette.schema import CassetteEntry, StreamChunk
 from reel.cassette.store import Cassette
 from reel.proxy.config import ProxyConfig
+from reel.proxy.router import Upstream
 
 
-async def replay(request: Request, cassette: Cassette) -> Response:
+async def replay(request: Request, upstream: Upstream, cassette: Cassette) -> Response:
     """Look up the cassette by fingerprint and return the stored response."""
     body = await request.body()
-    fp = openai_fingerprint(body, endpoint=request.url.path)
+    fp = upstream.adapter.fingerprint(body, endpoint=request.url.path)
 
     entry = cassette.find(fp)
     if entry is None:

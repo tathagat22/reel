@@ -48,7 +48,7 @@ async def dispatch(request: Request, upstream: Upstream) -> Response:
     if config.mode == "replay":
         if cassette is None:
             return _no_cassette_error("replay")
-        return await replay(request, cassette)
+        return await replay(request, upstream, cassette)
 
     if config.mode == "auto":
         if cassette is None:

@@ -17,6 +17,8 @@ DEFAULT_PORT = 7878
 
 # Upstream defaults — overridable via env or CLI flags.
 DEFAULT_OPENAI_UPSTREAM = "https://api.openai.com"
+DEFAULT_ANTHROPIC_UPSTREAM = "https://api.anthropic.com"
+DEFAULT_GEMINI_UPSTREAM = "https://generativelanguage.googleapis.com"
 
 
 @dataclass(frozen=True, slots=True)
@@ -28,6 +30,8 @@ class ProxyConfig:
     mode: Mode = "auto"
     cassette_path: str | None = None
     openai_upstream: str = DEFAULT_OPENAI_UPSTREAM
+    anthropic_upstream: str = DEFAULT_ANTHROPIC_UPSTREAM
+    gemini_upstream: str = DEFAULT_GEMINI_UPSTREAM
     request_timeout_seconds: float = 60.0
     replay_timing_multiplier: float = 1.0
     """Pacing for streamed replay chunks. ``1.0`` = realtime (default),
@@ -42,6 +46,10 @@ class ProxyConfig:
             mode=_parse_mode(os.environ.get("REEL_MODE", "auto")),
             cassette_path=os.environ.get("REEL_CASSETTE"),
             openai_upstream=os.environ.get("REEL_OPENAI_UPSTREAM", DEFAULT_OPENAI_UPSTREAM),
+            anthropic_upstream=os.environ.get(
+                "REEL_ANTHROPIC_UPSTREAM", DEFAULT_ANTHROPIC_UPSTREAM
+            ),
+            gemini_upstream=os.environ.get("REEL_GEMINI_UPSTREAM", DEFAULT_GEMINI_UPSTREAM),
             request_timeout_seconds=float(os.environ.get("REEL_TIMEOUT", "60")),
             replay_timing_multiplier=float(os.environ.get("REEL_REPLAY_TIMING", "1.0")),
         )

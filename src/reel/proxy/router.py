@@ -1,71 +1,98 @@
-"""Upstream routing.
+"""Multi-provider routing.
 
-Sprint 1: a single upstream per proxy instance (OpenAI by default). The router's
-job is twofold:
+Two routing styles are supported, in priority order:
 
-1. Decide which upstream a given request path should hit (today: always the
-   one configured upstream, but only if the path matches an allowed prefix).
-2. Refuse paths that don't look like a known LLM endpoint, so misconfigured
-   clients fail loudly with 404 instead of silently proxying garbage upstream.
+1. **Explicit provider URL prefix.** ``/<provider>/<rest>`` strips the prefix
+   and routes to ``<provider>``'s upstream. The user sets, e.g.,
+   ``ANTHROPIC_BASE_URL=http://localhost:7878/anthropic`` and any path under
+   that segment lands on Anthropic. This is the unambiguous form and the
+   only way to disambiguate endpoints that several providers share
+   (e.g., ``/v1/models``).
 
-Multi-provider routing (Anthropic + Gemini) arrives in Sprint 3 alongside the
-adapter rewrite. The interface is shaped to absorb that change without breaking
-callers.
+2. **Path-prefix matching.** Each adapter declares the URL prefixes it
+   responds to. The router scans upstreams in registration order and routes
+   to the first match. This preserves the Sprint 1 behavior of pointing
+   ``OPENAI_BASE_URL=http://localhost:7878/v1`` at the proxy with no extra
+   path segment.
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass
 
+from reel.adapters.anthropic import adapter as anthropic_adapter
+from reel.adapters.base import ProviderAdapter
+from reel.adapters.openai import adapter as openai_adapter
 from reel.proxy.config import ProxyConfig
-
-# OpenAI client SDKs hit /v1/... by default. We accept both with and without
-# the /v1 prefix in case the user sets ``OPENAI_BASE_URL`` directly to our root.
-OPENAI_ALLOWED_PREFIXES: tuple[str, ...] = (
-    "/v1/",
-    "/chat/",
-    "/completions",
-    "/embeddings",
-    "/models",
-)
 
 
 @dataclass(frozen=True, slots=True)
 class Upstream:
-    """A single upstream destination."""
+    """A single upstream destination with its adapter."""
 
     provider: str
     base_url: str
+    adapter: ProviderAdapter
+
+
+@dataclass(frozen=True, slots=True)
+class Resolution:
+    """The result of a successful routing decision."""
+
+    upstream: Upstream
+    rewritten_path: str
+    """The path to forward upstream — with any ``/<provider>/`` prefix stripped."""
 
 
 class Router:
-    """Resolve a proxied request to its upstream destination.
+    """Resolve a proxied request to its upstream destination."""
 
-    A return of ``None`` from :py:meth:`resolve` means "no route" — the proxy
-    will respond with 404 rather than blind-forwarding.
-    """
-
-    def __init__(self, upstream: Upstream, allowed_prefixes: tuple[str, ...]) -> None:
-        self._upstream = upstream
-        self._allowed = allowed_prefixes
+    def __init__(self, upstreams: list[Upstream]) -> None:
+        self._upstreams = tuple(upstreams)
 
     @property
-    def upstream(self) -> Upstream:
-        return self._upstream
+    def upstreams(self) -> tuple[Upstream, ...]:
+        return self._upstreams
 
     @property
     def allowed_prefixes(self) -> tuple[str, ...]:
-        return self._allowed
+        """Diagnostic — flat list of every accepted path prefix across providers."""
+        accepted: list[str] = []
+        for u in self._upstreams:
+            accepted.append(f"/{u.provider}/")
+            accepted.extend(u.adapter.path_prefixes)
+        return tuple(accepted)
 
-    def resolve(self, path: str) -> Upstream | None:
-        for prefix in self._allowed:
-            if path.startswith(prefix):
-                return self._upstream
+    def resolve(self, path: str) -> Resolution | None:
+        # Style 1: explicit provider URL prefix.
+        for upstream in self._upstreams:
+            tag = f"/{upstream.provider}/"
+            if path.startswith(tag):
+                rewritten = "/" + path[len(tag) :]
+                return Resolution(upstream=upstream, rewritten_path=rewritten)
+            if path == f"/{upstream.provider}":
+                return Resolution(upstream=upstream, rewritten_path="/")
+
+        # Style 2: provider path-prefix.
+        for upstream in self._upstreams:
+            for prefix in upstream.adapter.path_prefixes:
+                if path.startswith(prefix):
+                    return Resolution(upstream=upstream, rewritten_path=path)
         return None
 
     @classmethod
     def from_config(cls, config: ProxyConfig) -> Router:
         return cls(
-            upstream=Upstream(provider="openai", base_url=config.openai_upstream),
-            allowed_prefixes=OPENAI_ALLOWED_PREFIXES,
+            [
+                Upstream(
+                    provider=openai_adapter.name,
+                    base_url=config.openai_upstream,
+                    adapter=openai_adapter,
+                ),
+                Upstream(
+                    provider=anthropic_adapter.name,
+                    base_url=config.anthropic_upstream,
+                    adapter=anthropic_adapter,
+                ),
+            ]
         )

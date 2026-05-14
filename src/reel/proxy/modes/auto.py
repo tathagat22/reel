@@ -6,7 +6,6 @@ import httpx
 from starlette.requests import Request
 from starlette.responses import Response
 
-from reel.adapters.openai import fingerprint as openai_fingerprint
 from reel.cassette.store import Cassette
 from reel.proxy.config import ProxyConfig
 from reel.proxy.modes._capture import capture_buffered, capture_streaming
@@ -23,7 +22,7 @@ async def auto(
 ) -> Response:
     """Replay if fingerprint matches; otherwise forward upstream and record."""
     body = await request.body()
-    fingerprint = openai_fingerprint(body, endpoint=request.url.path)
+    fingerprint = upstream.adapter.fingerprint(body, endpoint=request.url.path)
 
     existing = cassette.find(fingerprint)
     if existing is not None:

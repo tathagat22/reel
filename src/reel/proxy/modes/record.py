@@ -6,7 +6,6 @@ import httpx
 from starlette.requests import Request
 from starlette.responses import Response
 
-from reel.adapters.openai import fingerprint as openai_fingerprint
 from reel.cassette.store import Cassette
 from reel.proxy.modes._capture import capture_buffered, capture_streaming
 from reel.proxy.router import Upstream
@@ -21,7 +20,7 @@ async def record(
 ) -> Response:
     """Forward upstream, persist the exchange, return the upstream response."""
     body = await request.body()
-    fingerprint = openai_fingerprint(body, endpoint=request.url.path)
+    fingerprint = upstream.adapter.fingerprint(body, endpoint=request.url.path)
 
     if is_streaming_request(body):
         return await capture_streaming(request, body, fingerprint, http_client, upstream, cassette)

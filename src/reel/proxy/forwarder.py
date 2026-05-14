@@ -162,8 +162,8 @@ async def proxy(request: Request) -> Response:
     app = request.app
     router: Router = app.state.router
 
-    upstream = router.resolve(request.url.path)
-    if upstream is None:
+    resolution = router.resolve(request.url.path)
+    if resolution is None:
         return JSONResponse(
             {
                 "error": "reel: no upstream configured for this path",
@@ -174,4 +174,13 @@ async def proxy(request: Request) -> Response:
             status_code=404,
         )
 
-    return await dispatch(request, upstream)
+    # Rewrite the ASGI scope so downstream readers of request.url.path see the
+    # upstream-facing path (with the optional /<provider>/ prefix stripped).
+    # `Request.url` is cached on first access, so we also invalidate it.
+    if resolution.rewritten_path != request.url.path:
+        request.scope["path"] = resolution.rewritten_path
+        request.scope["raw_path"] = resolution.rewritten_path.encode("ascii")
+        if hasattr(request, "_url"):
+            delattr(request, "_url")
+
+    return await dispatch(request, resolution.upstream)
