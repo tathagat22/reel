@@ -14,6 +14,7 @@ from rich.console import Console
 
 from reel import __version__
 from reel.cassette.reader import CassetteReader
+from reel.cli.commands import inspect as inspect_cmd
 from reel.proxy.config import DEFAULT_HOST, DEFAULT_OPENAI_UPSTREAM, DEFAULT_PORT, ProxyConfig
 from reel.proxy.server import serve
 from reel.redact import contains_pii, contains_secret, redact_entry
@@ -165,6 +166,9 @@ def auto(
     cfg = _build_config("auto", host, port, cassette, upstream, timing_multiplier=multiplier)
     _print_banner("auto", cassette, host, port, upstream)
     serve(cfg)
+
+
+app.command(name="inspect")(inspect_cmd.run)
 
 
 @app.command()
