@@ -36,6 +36,10 @@ class ProxyConfig:
     replay_timing_multiplier: float = 1.0
     """Pacing for streamed replay chunks. ``1.0`` = realtime (default),
     ``0.0`` = fast (no sleep), ``N`` (>1) = N-times-slower playback."""
+    redact_pii: bool = True
+    """If True, scrub email + phone patterns from cassette entries on capture.
+    Set False (``REEL_REDACT_PII=0``) when capturing benchmark data that
+    legitimately needs to round-trip exact values."""
 
     @classmethod
     def from_env(cls) -> ProxyConfig:
@@ -52,6 +56,8 @@ class ProxyConfig:
             gemini_upstream=os.environ.get("REEL_GEMINI_UPSTREAM", DEFAULT_GEMINI_UPSTREAM),
             request_timeout_seconds=float(os.environ.get("REEL_TIMEOUT", "60")),
             replay_timing_multiplier=float(os.environ.get("REEL_REPLAY_TIMING", "1.0")),
+            redact_pii=os.environ.get("REEL_REDACT_PII", "1").strip().lower()
+            not in ("0", "false", "no"),
         )
 
 

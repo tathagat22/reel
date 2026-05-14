@@ -15,6 +15,7 @@ from reel.cassette.body import parse_for_storage
 from reel.cassette.schema import CassetteEntry, CassetteRequest, CassetteResponse
 from reel.cassette.store import Cassette
 from reel.cassette.writer import generate_id, now_iso
+from reel.proxy.config import ProxyConfig
 from reel.proxy.forwarder import forward_with_body, response_from_result
 from reel.proxy.router import Upstream
 from reel.proxy.stream import (
@@ -24,6 +25,12 @@ from reel.proxy.stream import (
     read_all_and_close,
     stream_and_capture,
 )
+from reel.redact import redact_entry
+
+
+def _config(request: Request) -> ProxyConfig:
+    cfg: ProxyConfig = request.app.state.config
+    return cfg
 
 
 async def capture_buffered(
@@ -34,7 +41,11 @@ async def capture_buffered(
     upstream: Upstream,
     cassette: Cassette,
 ) -> Response:
-    """Forward a non-streaming request upstream and store the exchange."""
+    """Forward a non-streaming request upstream and store the exchange.
+
+    The persisted entry is redacted (secrets always; PII unless disabled in
+    config) before it hits disk.
+    """
     query = str(request.url.query) if request.url.query else ""
 
     result = await forward_with_body(
@@ -47,7 +58,7 @@ async def capture_buffered(
         upstream=upstream,
     )
 
-    entry = CassetteEntry(
+    raw_entry = CassetteEntry(
         id=generate_id(),
         ts=now_iso(),
         provider=upstream.provider,
@@ -63,7 +74,8 @@ async def capture_buffered(
             body=parse_for_storage(result.response_body),
         ),
     )
-    await cassette.append(entry)
+    safe_entry = redact_entry(raw_entry, scrub_pii=_config(request).redact_pii)
+    await cassette.append(safe_entry)
     return response_from_result(result)
 
 
@@ -94,9 +106,11 @@ async def capture_streaming(
         upstream=upstream,
     )
 
+    scrub_pii = _config(request).redact_pii
+
     if not is_sse_response(capture.response_media_type):
         body_bytes = await read_all_and_close(upstream_resp)
-        entry = CassetteEntry(
+        raw_entry = CassetteEntry(
             id=generate_id(),
             ts=now_iso(),
             provider=upstream.provider,
@@ -112,7 +126,7 @@ async def capture_streaming(
                 body=parse_for_storage(body_bytes),
             ),
         )
-        await cassette.append(entry)
+        await cassette.append(redact_entry(raw_entry, scrub_pii=scrub_pii))
         return Response(
             content=body_bytes,
             status_code=capture.response_status,
@@ -127,9 +141,8 @@ async def capture_streaming(
         # would poison the cassette on next replay — only persist on
         # clean upstream completion.
         if capture.completed:
-            await cassette.append(
-                _build_streaming_entry(request, body, fingerprint, upstream, capture)
-            )
+            raw_entry = _build_streaming_entry(request, body, fingerprint, upstream, capture)
+            await cassette.append(redact_entry(raw_entry, scrub_pii=scrub_pii))
 
     return StreamingResponse(
         stream_then_persist(),
