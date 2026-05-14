@@ -76,9 +76,7 @@ def test_upstream_4xx_status_propagates(app_client: TestClient) -> None:
 
 @respx.mock
 def test_upstream_network_error_returns_502(app_client: TestClient) -> None:
-    respx.post(f"{UPSTREAM}/v1/chat/completions").mock(
-        side_effect=httpx.ConnectError("boom")
-    )
+    respx.post(f"{UPSTREAM}/v1/chat/completions").mock(side_effect=httpx.ConnectError("boom"))
     with app_client as client:
         r = client.post("/v1/chat/completions", json={"model": "gpt-5"})
     assert r.status_code == 502

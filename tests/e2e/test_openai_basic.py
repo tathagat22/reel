@@ -169,10 +169,7 @@ def test_tool_call_round_trip(tmp_path: Path) -> None:
     assert a.status_code == 200
     assert b.json() == a.json()
     # tool_calls field survives intact.
-    assert (
-        b.json()["choices"][0]["message"]["tool_calls"][0]["function"]["name"]
-        == "get_weather"
-    )
+    assert b.json()["choices"][0]["message"]["tool_calls"][0]["function"]["name"] == "get_weather"
     assert upstream.call_count == 1
 
 

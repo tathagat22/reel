@@ -70,7 +70,9 @@ async def test_replay_emits_sse_chunks(tmp_path: Path) -> None:
         StreamChunk(data={"delta": " world"}, t_offset_ms=10),
         StreamChunk(data="[DONE]", t_offset_ms=15),
     ]
-    await _seed_streaming_cassette(tmp_path / "tape.jsonl", request_body=request_body, chunks=chunks)
+    await _seed_streaming_cassette(
+        tmp_path / "tape.jsonl", request_body=request_body, chunks=chunks
+    )
 
     with _client(tmp_path / "tape.jsonl", timing_multiplier=0.0) as client:
         r = client.post(CHAT, json=request_body)

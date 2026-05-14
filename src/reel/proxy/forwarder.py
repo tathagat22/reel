@@ -142,9 +142,9 @@ async def forward_request(
     result = await forward_with_body(
         method=request.method,
         path=request.url.path,
-        query=request.url.query.decode("ascii") if isinstance(request.url.query, bytes) else str(
-            request.url.query
-        ),
+        query=request.url.query.decode("ascii")
+        if isinstance(request.url.query, bytes)
+        else str(request.url.query),
         headers=request.headers,
         body=body,
         http_client=http_client,

@@ -28,7 +28,9 @@ def test_identical_bodies_identical_fingerprints() -> None:
 def test_whitespace_difference_does_not_change_fingerprint() -> None:
     compact = b'{"model":"gpt-5","messages":[{"role":"user","content":"hi"}]}'
     spaced = b'{ "model" : "gpt-5" ,  "messages" : [ { "role" : "user" , "content" : "hi" } ] }'
-    assert fingerprint(compact, endpoint=CHAT_ENDPOINT) == fingerprint(spaced, endpoint=CHAT_ENDPOINT)
+    assert fingerprint(compact, endpoint=CHAT_ENDPOINT) == fingerprint(
+        spaced, endpoint=CHAT_ENDPOINT
+    )
 
 
 def test_key_order_does_not_change_fingerprint() -> None:

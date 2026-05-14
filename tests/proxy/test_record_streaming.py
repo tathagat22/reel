@@ -103,9 +103,7 @@ def test_streaming_request_records_chunks_with_timing(
 
 
 @respx.mock
-def test_non_streaming_request_uses_buffered_path(
-    app_client: TestClient, tmp_path: Path
-) -> None:
+def test_non_streaming_request_uses_buffered_path(app_client: TestClient, tmp_path: Path) -> None:
     """A request without stream=true still goes through the buffered codepath."""
     respx.post(f"{UPSTREAM}/v1/chat/completions").mock(
         return_value=httpx.Response(200, json={"id": "buffered"})

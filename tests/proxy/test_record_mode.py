@@ -99,9 +99,7 @@ def test_record_does_not_capture_request_headers(app_client: TestClient, tmp_pat
 
 
 @respx.mock
-def test_record_captures_multiple_requests_in_order(
-    app_client: TestClient, tmp_path: Path
-) -> None:
+def test_record_captures_multiple_requests_in_order(app_client: TestClient, tmp_path: Path) -> None:
     route = respx.post(f"{UPSTREAM}/v1/chat/completions").mock(
         side_effect=[
             httpx.Response(200, json={"choices": [{"message": {"content": "first"}}]}),
@@ -110,8 +108,14 @@ def test_record_captures_multiple_requests_in_order(
     )
 
     with app_client as client:
-        client.post("/v1/chat/completions", json={"model": "gpt-5", "messages": [{"role": "user", "content": "a"}]})
-        client.post("/v1/chat/completions", json={"model": "gpt-5", "messages": [{"role": "user", "content": "b"}]})
+        client.post(
+            "/v1/chat/completions",
+            json={"model": "gpt-5", "messages": [{"role": "user", "content": "a"}]},
+        )
+        client.post(
+            "/v1/chat/completions",
+            json={"model": "gpt-5", "messages": [{"role": "user", "content": "b"}]},
+        )
 
     assert route.call_count == 2
     cassette = Cassette(tmp_path / "tape.jsonl")
@@ -122,9 +126,7 @@ def test_record_captures_multiple_requests_in_order(
 
 
 @respx.mock
-def test_record_persists_upstream_error_status(
-    app_client: TestClient, tmp_path: Path
-) -> None:
+def test_record_persists_upstream_error_status(app_client: TestClient, tmp_path: Path) -> None:
     """A 429 from upstream is a real response — record it faithfully."""
     respx.post(f"{UPSTREAM}/v1/chat/completions").mock(
         return_value=httpx.Response(429, json={"error": {"message": "rate limited"}})

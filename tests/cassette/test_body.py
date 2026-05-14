@@ -18,6 +18,7 @@ def test_json_object_round_trip() -> None:
     re_serialized = serialize_from_storage(parsed)
     # Bytes may not be byte-identical (whitespace) but the parsed form is.
     import json
+
     assert json.loads(re_serialized) == json.loads(body)
 
 
@@ -35,7 +36,7 @@ def test_string_body_round_trip() -> None:
 
 
 def test_list_body_round_trip() -> None:
-    parsed = parse_for_storage(b'[1,2,3]')
+    parsed = parse_for_storage(b"[1,2,3]")
     assert parsed == [1, 2, 3]
     assert serialize_from_storage(parsed) == b"[1, 2, 3]"
 

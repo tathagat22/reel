@@ -93,8 +93,12 @@ def test_different_requests_each_get_recorded(tmp_path: Path) -> None:
     cassette_path = tmp_path / "tape.jsonl"
 
     with _client(cassette_path) as client:
-        a = client.post(CHAT, json={"model": "gpt-5", "messages": [{"role": "user", "content": "a"}]})
-        b = client.post(CHAT, json={"model": "gpt-5", "messages": [{"role": "user", "content": "b"}]})
+        a = client.post(
+            CHAT, json={"model": "gpt-5", "messages": [{"role": "user", "content": "a"}]}
+        )
+        b = client.post(
+            CHAT, json={"model": "gpt-5", "messages": [{"role": "user", "content": "b"}]}
+        )
 
     assert a.json()["text"] == "first"
     assert b.json()["text"] == "second"

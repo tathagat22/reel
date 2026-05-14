@@ -127,7 +127,9 @@ async def capture_streaming(
         # would poison the cassette on next replay — only persist on
         # clean upstream completion.
         if capture.completed:
-            await cassette.append(_build_streaming_entry(request, body, fingerprint, upstream, capture))
+            await cassette.append(
+                _build_streaming_entry(request, body, fingerprint, upstream, capture)
+            )
 
     return StreamingResponse(
         stream_then_persist(),

@@ -101,7 +101,7 @@ def test_realistic_openai_stream() -> None:
         b'data: {"choices":[{"delta":{"role":"assistant","content":""}}]}\n\n'
         b'data: {"choices":[{"delta":{"content":"Hello"}}]}\n\n'
         b'data: {"choices":[{"delta":{"content":" world"}}]}\n\n'
-        b'data: [DONE]\n\n'
+        b"data: [DONE]\n\n"
     )
     events = list(parser.feed(raw)) + list(parser.close())
     assert len(events) == 4

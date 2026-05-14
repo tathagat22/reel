@@ -21,7 +21,13 @@ from reel.proxy.config import ProxyConfig
 
 # OpenAI client SDKs hit /v1/... by default. We accept both with and without
 # the /v1 prefix in case the user sets ``OPENAI_BASE_URL`` directly to our root.
-OPENAI_ALLOWED_PREFIXES: tuple[str, ...] = ("/v1/", "/chat/", "/completions", "/embeddings", "/models")
+OPENAI_ALLOWED_PREFIXES: tuple[str, ...] = (
+    "/v1/",
+    "/chat/",
+    "/completions",
+    "/embeddings",
+    "/models",
+)
 
 
 @dataclass(frozen=True, slots=True)
