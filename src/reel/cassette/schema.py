@@ -33,6 +33,23 @@ class CassetteRequest(BaseModel):
     non-JSON bodies. ``None`` means the request had no body."""
 
 
+class StreamChunk(BaseModel):
+    """One captured SSE event from a streaming upstream response.
+
+    ``data`` is stored in a diff-friendly form: parsed JSON when the SSE
+    payload was valid JSON, otherwise the raw string (e.g., ``"[DONE]"``).
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    data: Any
+    t_offset_ms: int
+    """Milliseconds from the first byte of the upstream response."""
+    event: str | None = None
+    """SSE ``event:`` field if the upstream set one (Anthropic uses these;
+    OpenAI doesn't)."""
+
+
 class CassetteResponse(BaseModel):
     """Captured response side of an exchange."""
 
@@ -41,9 +58,12 @@ class CassetteResponse(BaseModel):
     status: int
     headers: dict[str, str] = Field(default_factory=dict)
     body: Any = None
-    """Same convention as :py:attr:`CassetteRequest.body`. For streaming
-    responses (Sprint 2+), the chunk list lives elsewhere and ``body`` is
-    ``None``."""
+    """Buffered response body. Same convention as
+    :py:attr:`CassetteRequest.body`. Set to ``None`` for streaming responses
+    — :py:attr:`stream_chunks` carries them instead."""
+    stream_chunks: list[StreamChunk] | None = None
+    """Captured SSE events for streaming responses, with timing offsets that
+    let replay reproduce TTFT and inter-chunk gaps."""
 
 
 class CassetteEntry(BaseModel):

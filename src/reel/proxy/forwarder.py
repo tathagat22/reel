@@ -58,15 +58,18 @@ class ForwardResult:
     response_media_type: str | None
 
 
-def _strip_request_headers(headers: Mapping[str, str]) -> dict[str, str]:
+def strip_request_headers(headers: Mapping[str, str]) -> dict[str, str]:
+    """Drop hop-by-hop headers (and ``Host``) before forwarding upstream."""
     return {k: v for k, v in headers.items() if k.lower() not in HOP_BY_HOP | {"host"}}
 
 
-def _strip_response_headers(headers: Mapping[str, str]) -> dict[str, str]:
+def strip_response_headers(headers: Mapping[str, str]) -> dict[str, str]:
+    """Drop hop-by-hop and length/encoding headers from an upstream response."""
     return {k: v for k, v in headers.items() if k.lower() not in RESPONSE_STRIP}
 
 
-def _build_upstream_url(upstream: Upstream, path: str, query: str) -> str:
+def build_upstream_url(upstream: Upstream, path: str, query: str) -> str:
+    """Compose an absolute upstream URL from path + query."""
     target = upstream.base_url.rstrip("/") + path
     if query:
         target = f"{target}?{query}"
@@ -84,8 +87,8 @@ async def forward_with_body(
     upstream: Upstream,
 ) -> ForwardResult:
     """Forward one pre-extracted request upstream and return the captured result."""
-    target = _build_upstream_url(upstream, path, query)
-    filtered = _strip_request_headers(headers)
+    target = build_upstream_url(upstream, path, query)
+    filtered = strip_request_headers(headers)
 
     try:
         upstream_resp = await http_client.request(
@@ -114,7 +117,7 @@ async def forward_with_body(
         request_body=body,
         response_status=upstream_resp.status_code,
         response_body=upstream_resp.content,
-        response_headers=_strip_response_headers(upstream_resp.headers),
+        response_headers=strip_response_headers(upstream_resp.headers),
         response_media_type=upstream_resp.headers.get("content-type"),
     )
 

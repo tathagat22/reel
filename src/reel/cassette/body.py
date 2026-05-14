@@ -41,3 +41,24 @@ def serialize_from_storage(stored: Any) -> bytes:
     if isinstance(stored, str):
         return stored.encode("utf-8")
     raise TypeError(f"unexpected stored body type: {type(stored).__name__}")
+
+
+def parse_sse_data(value: str) -> Any:
+    """Parse an SSE ``data:`` payload into a JSON-friendly cassette form.
+
+    Differs from :func:`parse_for_storage` because SSE payloads are always
+    text — no base64 envelope needed for non-JSON values like ``"[DONE]"``.
+    """
+    if not value:
+        return ""
+    try:
+        return json.loads(value)
+    except json.JSONDecodeError:
+        return value
+
+
+def serialize_sse_data(stored: Any) -> str:
+    """Reverse :func:`parse_sse_data` — produce the string for ``data: <here>``."""
+    if isinstance(stored, str):
+        return stored
+    return json.dumps(stored)
