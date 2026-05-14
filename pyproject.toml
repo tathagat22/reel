@@ -1,0 +1,97 @@
+[project]
+name = "reel"
+version = "0.0.1"
+description = "VCR for LLM APIs — record and replay OpenAI/Anthropic/Gemini calls including streaming."
+readme = "README.md"
+requires-python = ">=3.11"
+license = "Apache-2.0"
+authors = [
+    { name = "Tathagat Maitray", email = "tathagatmaitray@gmail.com" },
+]
+keywords = ["llm", "openai", "anthropic", "gemini", "testing", "vcr", "proxy", "mock", "replay"]
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Testing",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    "httpx>=0.27",
+    "starlette>=0.40",
+    "uvicorn[standard]>=0.32",
+    "typer>=0.13",
+    "rich>=13.9",
+    "pydantic>=2.9",
+]
+
+[project.optional-dependencies]
+fuzzy = [
+    "sentence-transformers>=3.0",
+]
+
+[project.scripts]
+reel = "reel.cli.main:app"
+
+[project.urls]
+Homepage = "https://github.com/tathagatmaitray/reel"
+Repository = "https://github.com/tathagatmaitray/reel"
+Issues = "https://github.com/tathagatmaitray/reel/issues"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/reel"]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3",
+    "pytest-asyncio>=0.24",
+    "pytest-cov>=6.0",
+    "ruff>=0.7",
+    "pyright>=1.1.385",
+    "pre-commit>=4.0",
+    "respx>=0.21",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = [
+    "E", "F", "W",   # pycodestyle + pyflakes
+    "I",             # isort
+    "B",             # bugbear
+    "UP",            # pyupgrade
+    "SIM",           # simplify
+    "RUF",           # ruff-specific
+    "ASYNC",         # async pitfalls
+]
+ignore = ["E501"]  # line length handled by formatter
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.pyright]
+include = ["src", "tests"]
+pythonVersion = "3.11"
+typeCheckingMode = "strict"
+reportMissingImports = "error"
+reportMissingTypeStubs = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+addopts = "-ra --strict-markers"
+markers = [
+    "integration: tests that require a live API key (skipped in CI by default)",
+]
