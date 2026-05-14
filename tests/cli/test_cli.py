@@ -56,10 +56,12 @@ def test_help_lists_all_commands(runner: CliRunner) -> None:
 
 def test_doctor_with_missing_cassette(runner: CliRunner, tmp_path: Path) -> None:
     missing = tmp_path / "nope.jsonl"
-    result = runner.invoke(app, ["doctor", "--cassette", str(missing)])
+    # Sprint 5.7: doctor now checks the parent dir is writable rather than
+    # whether the cassette file already exists. tmp_path is writable so this
+    # is a happy-path run.
+    result = runner.invoke(app, ["doctor", "--skip-network", "--cassette", str(missing)])
     assert result.exit_code == 0
-    # Either "False" or just "exists: False" — be tolerant of formatting.
-    assert "False" in result.stdout or "false" in result.stdout.lower()
+    assert "cassette" in result.stdout.lower()
 
 
 # ─── record ────────────────────────────────────────────────────────────
