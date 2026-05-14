@@ -56,6 +56,38 @@ UpstreamOpt = Annotated[
     str,
     typer.Option("--upstream", help="OpenAI-compatible upstream base URL."),
 ]
+TimingOpt = Annotated[
+    str,
+    typer.Option(
+        "--timing",
+        help="Streamed replay pacing: 'realtime' (default), 'fast', 'slow=<N>', or a bare multiplier (1.0=realtime, 0=fast).",
+    ),
+]
+
+
+def parse_timing(value: str) -> float:
+    """Translate a CLI ``--timing`` value to a sleep-multiplier float."""
+    v = value.strip().lower()
+    if v == "realtime":
+        return 1.0
+    if v == "fast":
+        return 0.0
+    if v.startswith("slow="):
+        try:
+            n = float(v[5:])
+        except ValueError as exc:
+            raise typer.BadParameter(
+                f"--timing slow=<N>: expected a number, got {value[5:]!r}"
+            ) from exc
+        if n <= 0:
+            raise typer.BadParameter("--timing slow=<N>: multiplier must be > 0")
+        return n
+    try:
+        return float(v)
+    except ValueError as exc:
+        raise typer.BadParameter(
+            "--timing must be 'realtime', 'fast', 'slow=<N>', or a bare number"
+        ) from exc
 
 
 def _print_banner(mode: str, cassette: Path | None, host: str, port: int, upstream: str) -> None:
@@ -72,6 +104,7 @@ def _build_config(
     port: int,
     cassette: Path | None,
     upstream: str,
+    timing_multiplier: float = 1.0,
 ) -> ProxyConfig:
     return ProxyConfig(
         host=host,
@@ -79,6 +112,7 @@ def _build_config(
         mode=mode,  # type: ignore[arg-type]
         cassette_path=str(cassette) if cassette is not None else None,
         openai_upstream=upstream,
+        replay_timing_multiplier=timing_multiplier,
     )
 
 
@@ -104,12 +138,14 @@ def replay(
     host: HostOpt = DEFAULT_HOST,
     port: PortOpt = DEFAULT_PORT,
     upstream: UpstreamOpt = DEFAULT_OPENAI_UPSTREAM,
+    timing: TimingOpt = "realtime",
 ) -> None:
     """Serve responses from the cassette only. 404 on miss; no network."""
     if not cassette.exists():
         console.print(f"[bold red]error[/] cassette not found: {cassette}")
         raise typer.Exit(code=2)
-    cfg = _build_config("replay", host, port, cassette, upstream)
+    multiplier = parse_timing(timing)
+    cfg = _build_config("replay", host, port, cassette, upstream, timing_multiplier=multiplier)
     _print_banner("replay", cassette, host, port, upstream)
     serve(cfg)
 
@@ -120,9 +156,11 @@ def auto(
     host: HostOpt = DEFAULT_HOST,
     port: PortOpt = DEFAULT_PORT,
     upstream: UpstreamOpt = DEFAULT_OPENAI_UPSTREAM,
+    timing: TimingOpt = "realtime",
 ) -> None:
     """Replay if cached, else record. The right default for local dev."""
-    cfg = _build_config("auto", host, port, cassette, upstream)
+    multiplier = parse_timing(timing)
+    cfg = _build_config("auto", host, port, cassette, upstream, timing_multiplier=multiplier)
     _print_banner("auto", cassette, host, port, upstream)
     serve(cfg)
 

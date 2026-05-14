@@ -29,6 +29,9 @@ class ProxyConfig:
     cassette_path: str | None = None
     openai_upstream: str = DEFAULT_OPENAI_UPSTREAM
     request_timeout_seconds: float = 60.0
+    replay_timing_multiplier: float = 1.0
+    """Pacing for streamed replay chunks. ``1.0`` = realtime (default),
+    ``0.0`` = fast (no sleep), ``N`` (>1) = N-times-slower playback."""
 
     @classmethod
     def from_env(cls) -> ProxyConfig:
@@ -40,6 +43,7 @@ class ProxyConfig:
             cassette_path=os.environ.get("REEL_CASSETTE"),
             openai_upstream=os.environ.get("REEL_OPENAI_UPSTREAM", DEFAULT_OPENAI_UPSTREAM),
             request_timeout_seconds=float(os.environ.get("REEL_TIMEOUT", "60")),
+            replay_timing_multiplier=float(os.environ.get("REEL_REPLAY_TIMING", "1.0")),
         )
 
 
