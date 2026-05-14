@@ -1,5 +1,9 @@
 # Reel
 
+[![CI](https://github.com/tathagat22/reel/actions/workflows/ci.yml/badge.svg)](https://github.com/tathagat22/reel/actions/workflows/ci.yml)
+[![License](https://img.shields.io/badge/license-Apache_2.0-blue.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/python-3.11_|_3.12_|_3.13-blue.svg)](pyproject.toml)
+
 **VCR for LLM APIs.** Record real calls to OpenAI / Anthropic / Gemini once, then replay them deterministically in tests — including streaming, tool calls, and timing. No SDK lock-in, no real network in CI, no surprise spend.
 
 > Status: pre-alpha. **Sprints 1 + 2 of 6 are shipped** — OpenAI record / replay / auto modes work end-to-end, **including SSE streaming with byte + timing fidelity**. Anthropic, Gemini, redaction, and the pytest plugin land in Sprints 3-6. See [`docs/SPRINT_SHEET.md`](docs/SPRINT_SHEET.md).
