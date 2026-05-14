@@ -5,7 +5,7 @@ First — thanks for showing up. Reel is small enough that one good PR meaningfu
 ## Quick start
 
 ```bash
-git clone https://github.com/tathagatmaitray/reel
+git clone https://github.com/tathagat22/reel
 cd reel
 uv sync
 make check       # lint + types + tests

@@ -20,7 +20,7 @@
 For now (pre-alpha), install from source:
 
 ```bash
-git clone https://github.com/tathagatmaitray/reel
+git clone https://github.com/tathagat22/reel
 cd reel
 uv sync
 uv run reel --help

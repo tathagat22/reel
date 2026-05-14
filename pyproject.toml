@@ -38,9 +38,9 @@ fuzzy = [
 reel = "reel.cli.main:app"
 
 [project.urls]
-Homepage = "https://github.com/tathagatmaitray/reel"
-Repository = "https://github.com/tathagatmaitray/reel"
-Issues = "https://github.com/tathagatmaitray/reel/issues"
+Homepage = "https://github.com/tathagat22/reel"
+Repository = "https://github.com/tathagat22/reel"
+Issues = "https://github.com/tathagat22/reel/issues"
 
 [build-system]
 requires = ["hatchling"]
