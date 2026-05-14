@@ -23,7 +23,7 @@
 | 0.5 | GitHub Actions CI (lint + types + tests, py 3.11/3.12/3.13) | `.github/workflows/ci.yml` | CI green on first push | `[x]` |
 | 0.6 | `ARCHITECTURE.md` with proxy + adapter + cassette diagram | One-page doc | Doc committed | `[x]` |
 | 0.7 | `CONTRIBUTING.md` + `CODE_OF_CONDUCT.md` | Both files | Linked from README | `[x]` |
-| 0.8 | `CLAUDE.md` with codebase-memory directive + this sprint sheet | CLAUDE.md, docs/SPRINT_SHEET.md | Future sessions follow it | `[x]` |
+| 0.8 | Sprint sheet authored as the working source of truth | `docs/SPRINT_SHEET.md` | Future contributors follow it | `[x]` |
 
 ---
 
