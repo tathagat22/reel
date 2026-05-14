@@ -1,9 +1,6 @@
 """OpenAI provider adapter.
 
-Sprint 1.3 ships only the request fingerprint. The full
-:class:`reel.adapters.base.ProviderAdapter` interface is introduced in Sprint 3
-when Anthropic + Gemini join the party — at that point this module is
-refactored to implement the interface, but the fingerprint algorithm stays.
+Implements :class:`reel.adapters.base.ProviderAdapter` for the OpenAI HTTP API.
 
 ## Fingerprint contract
 
@@ -32,6 +29,8 @@ import hashlib
 import json
 from typing import Any, cast
 
+from reel.adapters.base import ProviderAdapter
+
 FINGERPRINT_IGNORE: frozenset[str] = frozenset(
     {
         "stream",
@@ -48,6 +47,27 @@ FINGERPRINT_IGNORE: frozenset[str] = frozenset(
 # Bumping this invalidates all old fingerprints, which is desirable on
 # breaking changes (e.g., changing which fields are ignored).
 ALGORITHM_VERSION = "v1"
+
+# URL prefixes the OpenAI API responds to. Two forms supported:
+# - Canonical ``/v1/...`` (when ``OPENAI_BASE_URL=http://proxy:7878``).
+# - SDK-managed ``/v1`` already in the base URL, e.g. user sets
+#   ``OPENAI_BASE_URL=http://proxy:7878/v1`` and the SDK hits ``/chat/...``.
+OPENAI_PATH_PREFIXES: tuple[str, ...] = (
+    "/v1/chat/",
+    "/v1/completions",
+    "/v1/embeddings",
+    "/v1/models",
+    "/v1/audio",
+    "/v1/images",
+    "/v1/moderations",
+    "/v1/batches",
+    "/v1/files",
+    "/v1/responses",
+    "/chat/",
+    "/completions",
+    "/embeddings",
+    "/models",
+)
 
 
 def fingerprint(body: bytes, *, endpoint: str = "") -> str:
@@ -92,3 +112,22 @@ def _drop_ignored(value: Any) -> Any:
         lst = cast(list[Any], value)
         return [_drop_ignored(item) for item in lst]
     return value
+
+
+class OpenAIAdapter(ProviderAdapter):
+    """OpenAI provider implementation of :class:`ProviderAdapter`."""
+
+    @property
+    def name(self) -> str:
+        return "openai"
+
+    @property
+    def path_prefixes(self) -> tuple[str, ...]:
+        return OPENAI_PATH_PREFIXES
+
+    def fingerprint(self, body: bytes, *, endpoint: str) -> str:
+        return fingerprint(body, endpoint=endpoint)
+
+
+# Module-level singleton — adapters are stateless, so one instance is enough.
+adapter: ProviderAdapter = OpenAIAdapter()
