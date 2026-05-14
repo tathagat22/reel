@@ -110,13 +110,13 @@
 
 | ID | Task | Deliverable | DoD | Status |
 |----|------|-------------|-----|--------|
-| 5.1 | `reel inspect <cassette>` (rich pretty-print) | CLI command | Readable, scannable | `[ ]` |
-| 5.2 | `reel inspect --filter` (provider, model, has-tool-call, regex) | CLI flags | All filters tested | `[ ]` |
-| 5.3 | `reel cost <cassette>` | `analytics/cost.py`, `pricing.json` | Prices current | `[ ]` |
-| 5.4 | `reel diff <a> <b>` | CLI command | Model/response/cost deltas | `[ ]` |
-| 5.5 | `reel stats <cassette>` (TTFT dist., tokens, errors) | CLI command | Useful summary | `[ ]` |
-| 5.6 | Structured JSON logs (`--log-format json`) | Logging refactor | Pipeable to jq | `[ ]` |
-| 5.7 | `reel doctor` | CLI command | Ports, upstream, write perms | `[ ]` |
+| 5.1 | `reel inspect <cassette>` (rich pretty-print) | CLI command | Readable, scannable | `[x]` |
+| 5.2 | `reel inspect --filter` (provider, model, has-tool-call, regex) | CLI flags | All filters tested | `[x]` |
+| 5.3 | `reel cost <cassette>` | `analytics/cost.py`, `pricing.json` | Prices current | `[x]` |
+| 5.4 | `reel diff <a> <b>` | CLI command | Model/response/cost deltas | `[x]` |
+| 5.5 | `reel stats <cassette>` (TTFT dist., tokens, errors) | CLI command | Useful summary | `[x]` |
+| 5.6 | Structured JSON logs (`--log-format json`) | `proxy/logs.py` + `--log-format` | Pipeable to jq | `[x]` |
+| 5.7 | `reel doctor` | CLI command | Ports, upstream, write perms | `[x]` |
 
 **Sprint 5 DoD:** Power users can debug a flaky LLM test in <1 minute using the CLI alone.
 

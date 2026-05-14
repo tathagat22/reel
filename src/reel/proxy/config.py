@@ -11,6 +11,7 @@ from dataclasses import dataclass
 from typing import Literal
 
 Mode = Literal["record", "replay", "auto"]
+LogFormat = Literal["text", "json"]
 
 DEFAULT_HOST = "127.0.0.1"
 DEFAULT_PORT = 7878
@@ -40,6 +41,9 @@ class ProxyConfig:
     """If True, scrub email + phone patterns from cassette entries on capture.
     Set False (``REEL_REDACT_PII=0``) when capturing benchmark data that
     legitimately needs to round-trip exact values."""
+    log_format: LogFormat = "text"
+    """Per-request log line format. ``json`` emits one JSON object per line
+    on stdout (pipeable to ``jq``); ``text`` is the default human-readable form."""
 
     @classmethod
     def from_env(cls) -> ProxyConfig:
@@ -58,6 +62,7 @@ class ProxyConfig:
             replay_timing_multiplier=float(os.environ.get("REEL_REPLAY_TIMING", "1.0")),
             redact_pii=os.environ.get("REEL_REDACT_PII", "1").strip().lower()
             not in ("0", "false", "no"),
+            log_format=_parse_log_format(os.environ.get("REEL_LOG_FORMAT", "text")),
         )
 
 
@@ -65,4 +70,11 @@ def _parse_mode(raw: str) -> Mode:
     normalized = raw.strip().lower()
     if normalized not in ("record", "replay", "auto"):
         raise ValueError(f"invalid REEL_MODE {raw!r}; expected record|replay|auto")
+    return normalized  # type: ignore[return-value]
+
+
+def _parse_log_format(raw: str) -> LogFormat:
+    normalized = raw.strip().lower()
+    if normalized not in ("text", "json"):
+        raise ValueError(f"invalid REEL_LOG_FORMAT {raw!r}; expected text|json")
     return normalized  # type: ignore[return-value]

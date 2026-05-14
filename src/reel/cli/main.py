@@ -70,6 +70,13 @@ TimingOpt = Annotated[
         help="Streamed replay pacing: 'realtime' (default), 'fast', 'slow=<N>', or a bare multiplier (1.0=realtime, 0=fast).",
     ),
 ]
+LogFormatOpt = Annotated[
+    str,
+    typer.Option(
+        "--log-format",
+        help="One-line per-request log format: 'text' (default, human) or 'json' (pipeable to jq).",
+    ),
+]
 
 
 def parse_timing(value: str) -> float:
@@ -112,7 +119,10 @@ def _build_config(
     cassette: Path | None,
     upstream: str,
     timing_multiplier: float = 1.0,
+    log_format: str = "text",
 ) -> ProxyConfig:
+    if log_format not in ("text", "json"):
+        raise typer.BadParameter(f"--log-format must be 'text' or 'json' (got {log_format!r})")
     return ProxyConfig(
         host=host,
         port=port,
@@ -120,6 +130,7 @@ def _build_config(
         cassette_path=str(cassette) if cassette is not None else None,
         openai_upstream=upstream,
         replay_timing_multiplier=timing_multiplier,
+        log_format=log_format,  # type: ignore[arg-type]
     )
 
 
@@ -132,9 +143,10 @@ def record(
     host: HostOpt = DEFAULT_HOST,
     port: PortOpt = DEFAULT_PORT,
     upstream: UpstreamOpt = DEFAULT_OPENAI_UPSTREAM,
+    log_format: LogFormatOpt = "text",
 ) -> None:
     """Forward every request upstream and capture it into the cassette."""
-    cfg = _build_config("record", host, port, cassette, upstream)
+    cfg = _build_config("record", host, port, cassette, upstream, log_format=log_format)
     _print_banner("record", cassette, host, port, upstream)
     serve(cfg)
 
@@ -146,13 +158,22 @@ def replay(
     port: PortOpt = DEFAULT_PORT,
     upstream: UpstreamOpt = DEFAULT_OPENAI_UPSTREAM,
     timing: TimingOpt = "realtime",
+    log_format: LogFormatOpt = "text",
 ) -> None:
     """Serve responses from the cassette only. 404 on miss; no network."""
     if not cassette.exists():
         console.print(f"[bold red]error[/] cassette not found: {cassette}")
         raise typer.Exit(code=2)
     multiplier = parse_timing(timing)
-    cfg = _build_config("replay", host, port, cassette, upstream, timing_multiplier=multiplier)
+    cfg = _build_config(
+        "replay",
+        host,
+        port,
+        cassette,
+        upstream,
+        timing_multiplier=multiplier,
+        log_format=log_format,
+    )
     _print_banner("replay", cassette, host, port, upstream)
     serve(cfg)
 
@@ -164,10 +185,13 @@ def auto(
     port: PortOpt = DEFAULT_PORT,
     upstream: UpstreamOpt = DEFAULT_OPENAI_UPSTREAM,
     timing: TimingOpt = "realtime",
+    log_format: LogFormatOpt = "text",
 ) -> None:
     """Replay if cached, else record. The right default for local dev."""
     multiplier = parse_timing(timing)
-    cfg = _build_config("auto", host, port, cassette, upstream, timing_multiplier=multiplier)
+    cfg = _build_config(
+        "auto", host, port, cassette, upstream, timing_multiplier=multiplier, log_format=log_format
+    )
     _print_banner("auto", cassette, host, port, upstream)
     serve(cfg)
 

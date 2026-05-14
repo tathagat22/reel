@@ -6,7 +6,7 @@
 
 **VCR for LLM APIs.** Record real calls to OpenAI / Anthropic / Gemini once, then replay them deterministically in tests — including streaming, tool calls, and timing. No SDK lock-in, no real network in CI, no surprise spend.
 
-> Status: pre-alpha. **Sprints 1-4 of 6 are shipped** — OpenAI / Anthropic / Gemini record / replay / auto modes, SSE streaming, smart-matcher modes, per-cassette match config, capture-time secret + PII redaction, and a first-class **pytest plugin** (`reel_cassette` fixture + `@cassette` decorator + `@pytest.mark.cassette`). `reel inspect / cost / diff` lands in Sprint 5; web UI + launch in Sprint 6. See [`docs/SPRINT_SHEET.md`](docs/SPRINT_SHEET.md).
+> Status: pre-alpha. **Sprints 1-5 of 6 are shipped** — OpenAI / Anthropic / Gemini record / replay / auto, SSE streaming, smart-matcher modes, per-cassette config, capture-time secret + PII redaction, a first-class **pytest plugin**, plus a full analytics CLI: `reel inspect / cost / diff / stats / doctor` and structured JSON per-request logs. Web UI + PyPI + launch in Sprint 6. See [`docs/SPRINT_SHEET.md`](docs/SPRINT_SHEET.md).
 
 ---
 
@@ -93,17 +93,18 @@ Cassettes are plain JSONL — diff them in PRs, grep them, redact them.
 - **Capture-time redaction** — secrets always scrubbed (OpenAI / Anthropic / Google / GitHub / AWS / Slack key shapes, Bearer tokens); PII (email + phone) scrubbed by default, opt out with `REEL_REDACT_PII=0`
 - **`reel redact -c <file>`** to scrub existing cassettes post-hoc
 - **Pre-commit hook** (`hooks/pre-commit-cassette-check.py`) refuses any staged JSONL containing a detectable secret
-- **pytest plugin** — auto-registered via the `pytest11` entry point. Use `reel_cassette` fixture, the `@cassette` decorator, or `@pytest.mark.cassette` — whichever style suits your suite. CLI: `pytest --reel-mode replay` for zero-network CI. See [`docs/guides/pytest.md`](docs/guides/pytest.md).
+- **pytest plugin** — auto-registered via the `pytest11` entry point. Use `reel_cassette` fixture, the `@cassette` decorator, or `@pytest.mark.cassette`. CLI: `pytest --reel-mode replay` for zero-network CI. See [`docs/guides/pytest.md`](docs/guides/pytest.md).
+- **Analytics CLI** — `reel inspect / cost / diff / stats / doctor` for browsing, costing, comparing, and summarizing cassettes (with composable filters, current pricing tables for OpenAI/Anthropic/Gemini, TTFT distributions for streaming entries).
+- **Structured logs** — `--log-format json` emits one JSON object per request, pipeable to `jq`.
 - Stable, provider-aware request fingerprinting (whitespace/key-order insensitive)
 - JSONL cassettes (git-friendly, append-safe)
 - API keys never captured — request headers are dropped by design
-- 222+ tests including 3 multi-provider E2E suites + pytest plugin tests via `pytester`
+- 332+ tests across analytics, multi-provider E2E, redaction, pytest plugin
 
 ## What's coming
 
 | Sprint | Lands |
 |--------|-------|
-| 5 | `reel inspect / cost / diff / stats / doctor` |
 | 6 | Web inspector UI, docs site, PyPI, Homebrew, launch |
 
 ## Project layout

@@ -17,14 +17,18 @@ buffered path in Sprint 2.1 and adds chunk capture for replay.
 from __future__ import annotations
 
 import json
+import time
 from collections.abc import Mapping
 from dataclasses import dataclass
+from datetime import UTC, datetime
 
 import httpx
 from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
 
-from reel.proxy.router import Router, Upstream
+from reel.proxy.config import ProxyConfig
+from reel.proxy.logs import emit as emit_log
+from reel.proxy.router import Resolution, Router, Upstream
 
 # RFC 7230 §6.1 hop-by-hop headers. We must not forward these between the
 # client and the upstream — they describe the per-connection link, not the
@@ -154,33 +158,69 @@ async def forward_request(
 
 
 async def proxy(request: Request) -> Response:
-    """Starlette catch-all handler — dispatches to the configured mode."""
+    """Starlette catch-all handler — dispatches to the configured mode.
+
+    Wraps the dispatch in start/end timing so every request emits exactly one
+    structured log line (text or JSON, configured at startup).
+    """
     # Import inside the handler to avoid an import cycle with proxy/modes/__init__.py
     # (modes themselves import from forwarder).
     from reel.proxy.modes import dispatch
 
     app = request.app
+    config: ProxyConfig = app.state.config
     router: Router = app.state.router
 
-    resolution = router.resolve(request.url.path)
+    started = time.monotonic()
+    request_method = request.method
+    request_path = request.url.path
+
+    resolution = router.resolve(request_path)
     if resolution is None:
-        return JSONResponse(
+        response = JSONResponse(
             {
                 "error": "reel: no upstream configured for this path",
-                "path": request.url.path,
+                "path": request_path,
                 "hint": "Reel proxies LLM endpoints. Point your SDK at a known path "
                 f"(allowed prefixes: {list(router.allowed_prefixes)}).",
             },
             status_code=404,
         )
+        _log_request(config, started, None, request_method, request_path, response.status_code)
+        return response
 
     # Rewrite the ASGI scope so downstream readers of request.url.path see the
     # upstream-facing path (with the optional /<provider>/ prefix stripped).
     # `Request.url` is cached on first access, so we also invalidate it.
-    if resolution.rewritten_path != request.url.path:
+    if resolution.rewritten_path != request_path:
         request.scope["path"] = resolution.rewritten_path
         request.scope["raw_path"] = resolution.rewritten_path.encode("ascii")
         if hasattr(request, "_url"):
             delattr(request, "_url")
 
-    return await dispatch(request, resolution.upstream)
+    response = await dispatch(request, resolution.upstream)
+    _log_request(config, started, resolution, request_method, request_path, response.status_code)
+    return response
+
+
+def _log_request(
+    config: ProxyConfig,
+    started: float,
+    resolution: Resolution | None,
+    method: str,
+    path: str,
+    status: int,
+) -> None:
+    """Build one log event for the just-completed request."""
+    emit_log(
+        {
+            "ts": datetime.now(UTC).isoformat(timespec="milliseconds"),
+            "mode": config.mode,
+            "provider": resolution.upstream.provider if resolution is not None else None,
+            "method": method,
+            "path": path,
+            "status": status,
+            "duration_ms": int((time.monotonic() - started) * 1000),
+        },
+        log_format=config.log_format,
+    )
