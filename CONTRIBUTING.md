@@ -36,13 +36,21 @@ You should see all checks pass on a clean clone. If not, open an issue immediate
 
 ## Cassettes in this repo
 
-Test cassettes live under `tests/cassettes/`. They are **redacted by default** — the CI gate refuses any cassette that contains a detectable secret pattern. If you record a new one, run:
+Test cassettes live under `tests/cassettes/`. They are **redacted by default** — Reel scrubs secrets (and PII unless opted out) on capture. If you ever need to scrub after the fact:
 
 ```bash
-uv run reel redact tests/cassettes/your-new.jsonl
+uv run reel redact -c tests/cassettes/your-new.jsonl
 ```
 
-before committing.
+### Pre-commit guardrail
+
+A repo-local hook at `hooks/pre-commit-cassette-check.py` refuses to commit any `*.jsonl` whose staged content contains a detectable secret pattern. Enable with:
+
+```bash
+uv run pre-commit install
+```
+
+It runs alongside ruff and the other built-in pre-commit checks.
 
 ## Commit messages
 

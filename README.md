@@ -6,7 +6,7 @@
 
 **VCR for LLM APIs.** Record real calls to OpenAI / Anthropic / Gemini once, then replay them deterministically in tests — including streaming, tool calls, and timing. No SDK lock-in, no real network in CI, no surprise spend.
 
-> Status: pre-alpha. **Sprints 1 + 2 of 6 are shipped** — OpenAI record / replay / auto modes work end-to-end, **including SSE streaming with byte + timing fidelity**. Anthropic, Gemini, redaction, and the pytest plugin land in Sprints 3-6. See [`docs/SPRINT_SHEET.md`](docs/SPRINT_SHEET.md).
+> Status: pre-alpha. **Sprints 1 + 2 + 3 of 6 are shipped** — OpenAI / Anthropic / Gemini record / replay / auto modes work end-to-end, including SSE streaming, smart-matcher modes (exact / normalized / ignore-fields / fuzzy), per-cassette match config, and capture-time secret + PII redaction. The pytest plugin lands in Sprint 4. See [`docs/SPRINT_SHEET.md`](docs/SPRINT_SHEET.md).
 
 ---
 
@@ -83,23 +83,25 @@ Cassettes are plain JSONL — diff them in PRs, grep them, redact them.
 | `reel record -c <path>` | Always forward + capture | First-pass capture / refresh |
 | `reel replay -c <path>` | Cassette-only; 404 on miss | **CI** (no API key needed) |
 
-## What works today (Sprints 1 + 2)
+## What works today (Sprints 1 + 2 + 3)
 
-- OpenAI HTTP API (`/v1/chat/completions`, `/v1/embeddings`, `/v1/models`, ...)
+- **OpenAI / Anthropic / Gemini** HTTP APIs — path-based routing or explicit `/<provider>/...` URL prefix for unambiguous multi-provider use
 - Three modes: `record`, `replay`, `auto`
-- **SSE streaming** — chunks captured with millisecond timing; replay reproduces TTFT and inter-chunk gaps
-- Timing modes: `--timing realtime | fast | slow=<N>` for streamed replay
-- Defensive fallback: stream=true requests that get a non-SSE response (e.g. 429 JSON) are stored as buffered entries so replay returns the real error
-- Stable request fingerprinting (whitespace/key-order insensitive, stream-flag insensitive)
+- **SSE streaming** — chunks captured with millisecond timing; replay reproduces TTFT and inter-chunk gaps; `--timing realtime | fast | slow=<N>`
+- **Smart match modes** — `exact`, `normalized` (default), `ignore-fields` for per-call `request_id`/`trace_id`, `fuzzy` (embedding similarity, optional `reel[fuzzy]` install)
+- **Per-cassette match config** via an optional `_meta` line — pick a mode once, every replay honors it
+- **Capture-time redaction** — secrets always scrubbed (OpenAI / Anthropic / Google / GitHub / AWS / Slack key shapes, Bearer tokens); PII (email + phone) scrubbed by default, opt out with `REEL_REDACT_PII=0`
+- **`reel redact -c <file>`** to scrub existing cassettes post-hoc
+- **Pre-commit hook** (`hooks/pre-commit-cassette-check.py`) refuses any staged JSONL containing a detectable secret
+- Stable, provider-aware request fingerprinting (whitespace/key-order insensitive)
 - JSONL cassettes (git-friendly, append-safe)
-- API keys never captured (request headers are dropped by design)
-- 131+ tests covering fingerprinting, forwarding, modes, streaming, end-to-end round trips
+- API keys never captured — request headers are dropped by design
+- 209+ tests including 3 multi-provider E2E suites
 
 ## What's coming
 
 | Sprint | Lands |
 |--------|-------|
-| 3 | Anthropic + Gemini adapters, smart matchers (normalized / fuzzy), full redaction |
 | 4 | `pytest` plugin (`@cassette` decorator) |
 | 5 | `reel inspect / cost / diff / stats / doctor` |
 | 6 | Web inspector UI, docs site, PyPI, Homebrew, launch |

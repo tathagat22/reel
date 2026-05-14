@@ -17,3 +17,12 @@ repos:
       - id: ruff
         args: ["--fix"]
       - id: ruff-format
+
+  - repo: local
+    hooks:
+      - id: reel-cassette-secrets
+        name: reel — refuse secret-tainted cassettes
+        language: system
+        entry: python hooks/pre-commit-cassette-check.py
+        files: '\.jsonl$'
+        pass_filenames: false

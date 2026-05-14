@@ -75,15 +75,15 @@
 
 | ID | Task | Deliverable | DoD | Status |
 |----|------|-------------|-----|--------|
-| 3.1 | Generic `ProviderAdapter` interface | `adapters/base.py` | OpenAI adapter refactored onto interface | `[ ]` |
-| 3.2 | Anthropic adapter — messages + SSE | `adapters/anthropic.py` | Record+replay non-stream and stream | `[ ]` |
-| 3.3 | Gemini adapter — generateContent + streamGenerateContent | `adapters/gemini.py` | Record+replay non-stream and stream | `[ ]` |
-| 3.4 | Smart matcher: `exact`, `normalized`, `ignore-fields`, `fuzzy` | `cassette/matcher.py` | Each mode has tests | `[ ]` |
-| 3.5 | Cassette-level match config | Schema + parser | Config respected on replay | `[ ]` |
-| 3.6 | Secret redactor (regex for `sk-...`, `Bearer`, key shapes) | `redact/secrets.py` | Cassette never contains live keys | `[ ]` |
-| 3.7 | PII redactor (emails, phone numbers, configurable) | `redact/pii.py` | Default-on, opt-out flag | `[ ]` |
-| 3.8 | `reel redact <cassette>` post-hoc | CLI command | Round-trip preserves shape | `[ ]` |
-| 3.9 | Pre-commit hook template (refuse secret-tainted cassettes) | `hooks/pre-commit-cassette-check` | Documented in README | `[ ]` |
+| 3.1 | Generic `ProviderAdapter` interface | `adapters/base.py` | OpenAI adapter refactored onto interface | `[x]` |
+| 3.2 | Anthropic adapter — messages + SSE | `adapters/anthropic.py` | Record+replay non-stream and stream | `[x]` |
+| 3.3 | Gemini adapter — generateContent + streamGenerateContent | `adapters/gemini.py` | Record+replay non-stream and stream | `[x]` |
+| 3.4 | Smart matcher: `exact`, `normalized`, `ignore-fields`, `fuzzy` | `cassette/matcher.py` | Each mode has tests | `[x]` |
+| 3.5 | Cassette-level match config | Schema + parser | Config respected on replay | `[x]` |
+| 3.6 | Secret redactor (regex for `sk-...`, `Bearer`, key shapes) | `redact/secrets.py` | Cassette never contains live keys | `[x]` |
+| 3.7 | PII redactor (emails, phone numbers, configurable) | `redact/pii.py` | Default-on, opt-out flag | `[x]` |
+| 3.8 | `reel redact <cassette>` post-hoc | CLI command | Round-trip preserves shape | `[x]` |
+| 3.9 | Pre-commit hook template (refuse secret-tainted cassettes) | `hooks/pre-commit-cassette-check.py` | Documented in CONTRIBUTING | `[x]` |
 
 **Sprint 3 DoD:** Same proxy serves three providers. Cassettes are safe to commit by default.
 
