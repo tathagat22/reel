@@ -15,6 +15,7 @@ from rich.console import Console
 from reel import __version__
 from reel.cassette.reader import CassetteReader
 from reel.cli.commands import cost as cost_cmd
+from reel.cli.commands import diff as diff_cmd
 from reel.cli.commands import doctor as doctor_cmd
 from reel.cli.commands import inspect as inspect_cmd
 from reel.proxy.config import DEFAULT_HOST, DEFAULT_OPENAI_UPSTREAM, DEFAULT_PORT, ProxyConfig
@@ -172,6 +173,7 @@ def auto(
 
 app.command(name="inspect")(inspect_cmd.run)
 app.command(name="cost")(cost_cmd.run)
+app.command(name="diff")(diff_cmd.run)
 app.command(name="doctor")(doctor_cmd.run)
 
 
