@@ -70,6 +70,10 @@ class OpenAIAdapter(ProviderAdapter):
     def fingerprint(self, body: bytes, *, endpoint: str) -> str:
         return fingerprint(body, endpoint=endpoint)
 
+    @property
+    def fingerprint_ignore(self) -> frozenset[str]:
+        return FINGERPRINT_IGNORE
+
 
 # Module-level singleton — adapters are stateless, so one instance is enough.
 adapter: ProviderAdapter = OpenAIAdapter()

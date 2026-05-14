@@ -50,5 +50,9 @@ class AnthropicAdapter(ProviderAdapter):
     def fingerprint(self, body: bytes, *, endpoint: str) -> str:
         return fingerprint(body, endpoint=endpoint)
 
+    @property
+    def fingerprint_ignore(self) -> frozenset[str]:
+        return FINGERPRINT_IGNORE
+
 
 adapter: ProviderAdapter = AnthropicAdapter()

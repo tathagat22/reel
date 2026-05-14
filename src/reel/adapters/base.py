@@ -55,6 +55,15 @@ class ProviderAdapter(ABC):
         so future migrations are unambiguous.
         """
 
+    @property
+    def fingerprint_ignore(self) -> frozenset[str]:
+        """Keys this adapter drops from the fingerprint by default.
+
+        Exposed so the ``ignore-fields`` matcher mode can extend the default
+        set with user-supplied keys. Default: empty (Gemini-style).
+        """
+        return frozenset()
+
     def is_streaming(self, path: str, body: bytes) -> bool:
         """``True`` if this (path, body) describes a streaming request.
 
