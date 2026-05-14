@@ -13,11 +13,33 @@ One JSON object per line. Designed to be:
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
 SCHEMA_VERSION = 1
+
+
+class MatchConfigSchema(BaseModel):
+    """Match settings persisted in a cassette's optional first-line ``_meta``.
+
+    This is the on-disk shape; :class:`reel.cassette.matcher.MatchConfig` is
+    the in-memory equivalent used by the matcher.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    mode: Literal["exact", "normalized", "ignore-fields", "fuzzy"] = "normalized"
+    ignore_fields: list[str] = Field(default_factory=list)
+    fuzzy_threshold: float = 0.85
+
+
+class CassetteMeta(BaseModel):
+    """Optional first-line metadata for a cassette."""
+
+    model_config = ConfigDict(extra="allow")  # forward-compat for future meta fields
+
+    match: MatchConfigSchema | None = None
 
 
 class CassetteRequest(BaseModel):

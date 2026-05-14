@@ -19,11 +19,11 @@ async def auto(
     upstream: Upstream,
     cassette: Cassette,
 ) -> Response:
-    """Replay if fingerprint matches; otherwise forward upstream and record."""
+    """Replay if cassette has a match (via its configured mode); else forward + capture."""
     body = await request.body()
     fingerprint = upstream.adapter.fingerprint(body, endpoint=request.url.path)
 
-    existing = cassette.find(fingerprint)
+    existing = cassette.find_smart(body=body, path=request.url.path, adapter=upstream.adapter)
     if existing is not None:
         config: ProxyConfig = request.app.state.config
         return response_from_entry(existing, timing_multiplier=config.replay_timing_multiplier)

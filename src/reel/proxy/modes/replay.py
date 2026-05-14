@@ -21,17 +21,16 @@ from reel.proxy.router import Upstream
 
 
 async def replay(request: Request, upstream: Upstream, cassette: Cassette) -> Response:
-    """Look up the cassette by fingerprint and return the stored response."""
+    """Look up the cassette using its configured match mode."""
     body = await request.body()
-    fp = upstream.adapter.fingerprint(body, endpoint=request.url.path)
-
-    entry = cassette.find(fp)
+    entry = cassette.find_smart(body=body, path=request.url.path, adapter=upstream.adapter)
     if entry is None:
         return JSONResponse(
             {
                 "error": "reel: no cassette entry matches this request",
-                "fingerprint": fp,
+                "fingerprint": upstream.adapter.fingerprint(body, endpoint=request.url.path),
                 "path": request.url.path,
+                "match_mode": cassette.match_config.mode,
                 "hint": (
                     "Switch to 'auto' or 'record' mode to capture this request, "
                     f"or check that the cassette ({cassette.path}) contains it."
