@@ -55,15 +55,15 @@
 
 | ID | Task | Deliverable | DoD | Status |
 |----|------|-------------|-----|--------|
-| 2.1 | SSE parser (read `data: ...\n\n` frames) | `proxy/sse.py` | Unit tests on OpenAI sample stream | `[ ]` |
-| 2.2 | SSE forwarder: stream chunks live while capturing | `proxy/stream_capture.py` | No buffering — chunks arrive live | `[ ]` |
-| 2.3 | Capture each chunk's wall-clock offset from first byte | Updated cassette schema | TTFT + inter-chunk gaps preserved | `[ ]` |
-| 2.4 | Streaming cassette entry shape (`stream_chunks: [{delta, t_offset_ms}]`) | Schema updated | New cassettes validate | `[ ]` |
-| 2.5 | Streaming replay: emit with `asyncio.sleep(offset)` | `proxy/stream_replay.py` | Replay TTFT within ±20ms | `[ ]` |
-| 2.6 | Timing modes: `realtime`, `fast`, `slow Nx` | CLI flag `--timing` | Tests for each mode | `[ ]` |
-| 2.7 | Handle stream interruptions / client disconnects | Error paths | No zombie tasks, no half-written cassettes | `[ ]` |
-| 2.8 | E2E: real OpenAI streaming → record → replay → assert chunks equal | `tests/e2e/test_streaming.py` | Passes locally | `[ ]` |
-| 2.9 | Demo GIF: pytest going from $5 → $0 with `--cassette` | `docs/demos/streaming.gif` | Embedded in README | `[ ]` |
+| 2.1 | SSE parser (read `data: ...\n\n` frames) | `proxy/sse.py` | Unit tests on OpenAI sample stream | `[x]` |
+| 2.2 | SSE forwarder: stream chunks live while capturing | `proxy/stream.py` | No buffering — chunks arrive live | `[x]` |
+| 2.3 | Capture each chunk's wall-clock offset from first byte | Updated cassette schema | TTFT + inter-chunk gaps preserved | `[x]` |
+| 2.4 | Streaming cassette entry shape (`stream_chunks: [{delta, t_offset_ms}]`) | Schema updated | New cassettes validate | `[x]` |
+| 2.5 | Streaming replay: emit with `asyncio.sleep(offset)` | `proxy/modes/replay.py` | Replay TTFT within ±20ms | `[x]` |
+| 2.6 | Timing modes: `realtime`, `fast`, `slow Nx` | CLI flag `--timing` | Tests for each mode | `[x]` |
+| 2.7 | Handle stream interruptions / client disconnects | Error paths | No zombie tasks, no half-written cassettes | `[x]` |
+| 2.8 | E2E: real OpenAI streaming → record → replay → assert chunks equal | `tests/e2e/test_streaming.py` | Passes locally | `[x]` |
+| 2.9 | Demo GIF: pytest going from $5 → $0 with `--cassette` | `docs/demos/streaming.gif` | Embedded in README | `[ ]` *(deferred — manual recording)* |
 
 **Sprint 2 DoD:** Streaming replay is indistinguishable from a real call (timing + content).
 

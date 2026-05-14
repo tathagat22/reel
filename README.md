@@ -2,7 +2,7 @@
 
 **VCR for LLM APIs.** Record real calls to OpenAI / Anthropic / Gemini once, then replay them deterministically in tests — including streaming, tool calls, and timing. No SDK lock-in, no real network in CI, no surprise spend.
 
-> Status: pre-alpha. **Sprint 1 of 6 is shipped** — OpenAI record / replay / auto modes work end-to-end. Streaming, Anthropic, Gemini, redaction, and the pytest plugin land in Sprints 2-6. See [`docs/SPRINT_SHEET.md`](docs/SPRINT_SHEET.md).
+> Status: pre-alpha. **Sprints 1 + 2 of 6 are shipped** — OpenAI record / replay / auto modes work end-to-end, **including SSE streaming with byte + timing fidelity**. Anthropic, Gemini, redaction, and the pytest plugin land in Sprints 3-6. See [`docs/SPRINT_SHEET.md`](docs/SPRINT_SHEET.md).
 
 ---
 
@@ -79,21 +79,22 @@ Cassettes are plain JSONL — diff them in PRs, grep them, redact them.
 | `reel record -c <path>` | Always forward + capture | First-pass capture / refresh |
 | `reel replay -c <path>` | Cassette-only; 404 on miss | **CI** (no API key needed) |
 
-## What works today (Sprint 1)
+## What works today (Sprints 1 + 2)
 
 - OpenAI HTTP API (`/v1/chat/completions`, `/v1/embeddings`, `/v1/models`, ...)
 - Three modes: `record`, `replay`, `auto`
+- **SSE streaming** — chunks captured with millisecond timing; replay reproduces TTFT and inter-chunk gaps
+- Timing modes: `--timing realtime | fast | slow=<N>` for streamed replay
+- Defensive fallback: stream=true requests that get a non-SSE response (e.g. 429 JSON) are stored as buffered entries so replay returns the real error
 - Stable request fingerprinting (whitespace/key-order insensitive, stream-flag insensitive)
 - JSONL cassettes (git-friendly, append-safe)
 - API keys never captured (request headers are dropped by design)
-- Non-streaming responses
-- 93+ tests covering fingerprinting, forwarding, modes, end-to-end round trips
+- 131+ tests covering fingerprinting, forwarding, modes, streaming, end-to-end round trips
 
 ## What's coming
 
 | Sprint | Lands |
 |--------|-------|
-| 2 | **SSE streaming** with byte + timing fidelity |
 | 3 | Anthropic + Gemini adapters, smart matchers (normalized / fuzzy), full redaction |
 | 4 | `pytest` plugin (`@cassette` decorator) |
 | 5 | `reel inspect / cost / diff / stats / doctor` |
