@@ -21,7 +21,9 @@ Gemini follow in 3.2 / 3.3.
 
 from __future__ import annotations
 
+import json
 from abc import ABC, abstractmethod
+from typing import Any, cast
 
 
 class ProviderAdapter(ABC):
@@ -52,3 +54,21 @@ class ProviderAdapter(ABC):
         inputs, and prefixed with the algorithm namespace (``sha256:``)
         so future migrations are unambiguous.
         """
+
+    def is_streaming(self, path: str, body: bytes) -> bool:
+        """``True`` if this (path, body) describes a streaming request.
+
+        Default implementation: looks for ``"stream": true`` in a top-level
+        JSON object. Override for providers that signal streaming differently
+        — e.g., Gemini uses ``:streamGenerateContent`` in the URL.
+        """
+        _ = path  # default ignores the path
+        if not body:
+            return False
+        try:
+            parsed: Any = json.loads(body)
+        except json.JSONDecodeError:
+            return False
+        if not isinstance(parsed, dict):
+            return False
+        return cast(dict[str, Any], parsed).get("stream") is True

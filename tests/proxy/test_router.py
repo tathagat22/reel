@@ -9,10 +9,10 @@ from reel.proxy.config import ProxyConfig
 from reel.proxy.router import Router, Upstream
 
 
-def test_from_config_includes_openai_and_anthropic() -> None:
+def test_from_config_includes_all_known_providers() -> None:
     router = Router.from_config(ProxyConfig())
     providers = {u.provider for u in router.upstreams}
-    assert providers == {"openai", "anthropic"}
+    assert providers == {"openai", "anthropic", "gemini"}
 
 
 def test_path_prefix_routes_openai_chat() -> None:

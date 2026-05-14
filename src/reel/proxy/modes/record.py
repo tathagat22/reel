@@ -9,7 +9,6 @@ from starlette.responses import Response
 from reel.cassette.store import Cassette
 from reel.proxy.modes._capture import capture_buffered, capture_streaming
 from reel.proxy.router import Upstream
-from reel.proxy.stream import is_streaming_request
 
 
 async def record(
@@ -22,6 +21,6 @@ async def record(
     body = await request.body()
     fingerprint = upstream.adapter.fingerprint(body, endpoint=request.url.path)
 
-    if is_streaming_request(body):
+    if upstream.adapter.is_streaming(request.url.path, body):
         return await capture_streaming(request, body, fingerprint, http_client, upstream, cassette)
     return await capture_buffered(request, body, fingerprint, http_client, upstream, cassette)

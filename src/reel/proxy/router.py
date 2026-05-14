@@ -22,6 +22,7 @@ from dataclasses import dataclass
 
 from reel.adapters.anthropic import adapter as anthropic_adapter
 from reel.adapters.base import ProviderAdapter
+from reel.adapters.gemini import adapter as gemini_adapter
 from reel.adapters.openai import adapter as openai_adapter
 from reel.proxy.config import ProxyConfig
 
@@ -93,6 +94,11 @@ class Router:
                     provider=anthropic_adapter.name,
                     base_url=config.anthropic_upstream,
                     adapter=anthropic_adapter,
+                ),
+                Upstream(
+                    provider=gemini_adapter.name,
+                    base_url=config.gemini_upstream,
+                    adapter=gemini_adapter,
                 ),
             ]
         )
