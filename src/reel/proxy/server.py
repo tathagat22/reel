@@ -23,6 +23,8 @@ from starlette.routing import Route
 
 from reel import __version__
 from reel.proxy.config import ProxyConfig
+from reel.proxy.forwarder import proxy as proxy_handler
+from reel.proxy.router import Router
 
 HTTP_CLIENT_KEY = "reel.http_client"
 CONFIG_KEY = "reel.config"
@@ -51,15 +53,25 @@ async def _lifespan(app: Starlette, config: ProxyConfig) -> AsyncGenerator[None]
         yield
 
 
+# Catch-all path pattern. Starlette matches more specific routes first, so
+# `/health` still wins for liveness probes — everything else lands in `proxy`.
+_PROXY_PATH = "/{full_path:path}"
+_PROXY_METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"]
+
+
 def create_app(config: ProxyConfig | None = None) -> Starlette:
-    """Build the ASGI app. Sprint 1.1 wires `/health` only."""
+    """Build the ASGI app."""
     cfg = config or ProxyConfig.from_env()
-    routes = [Route("/health", health, methods=["GET"])]
+    routes = [
+        Route("/health", health, methods=["GET"]),
+        Route(_PROXY_PATH, proxy_handler, methods=_PROXY_METHODS),
+    ]
     app = Starlette(
         routes=routes,
         lifespan=functools.partial(_lifespan, config=cfg),
     )
     app.state.config = cfg
+    app.state.router = Router.from_config(cfg)
     return app
 
 
