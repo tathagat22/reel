@@ -14,6 +14,8 @@ from rich.console import Console
 
 from reel import __version__
 from reel.cassette.reader import CassetteReader
+from reel.cli.commands import cost as cost_cmd
+from reel.cli.commands import doctor as doctor_cmd
 from reel.cli.commands import inspect as inspect_cmd
 from reel.proxy.config import DEFAULT_HOST, DEFAULT_OPENAI_UPSTREAM, DEFAULT_PORT, ProxyConfig
 from reel.proxy.server import serve
@@ -169,6 +171,8 @@ def auto(
 
 
 app.command(name="inspect")(inspect_cmd.run)
+app.command(name="cost")(cost_cmd.run)
+app.command(name="doctor")(doctor_cmd.run)
 
 
 @app.command()
@@ -248,20 +252,6 @@ def redact(
     lines.extend(scrubbed_entries)
     target.write_text("\n".join(lines) + "\n", encoding="utf-8")
     console.print(f"[bold green]wrote {target}[/]  ({len(scrubbed_entries)} entries)")
-
-
-@app.command()
-def doctor(
-    cassette: OptionalCassetteOpt = None,
-) -> None:
-    """Sanity-check Reel setup. (Stub — full implementation lands in Sprint 5.)"""
-    console.print(f"[bold magenta]reel[/] [dim]{__version__}[/] [yellow]doctor[/]")
-    console.print(f"  cassette: [cyan]{cassette or '(none provided)'}[/]")
-    if cassette is not None:
-        console.print(
-            f"    exists: [{'green' if cassette.exists() else 'red'}]{cassette.exists()}[/]"
-        )
-    console.print("[dim]Sprint 1.9 stub — full diagnostic check lands in Sprint 5.[/]")
 
 
 if __name__ == "__main__":
