@@ -13,8 +13,10 @@ import typer
 from rich.console import Console
 
 from reel import __version__
+from reel.cassette.reader import CassetteReader
 from reel.proxy.config import DEFAULT_HOST, DEFAULT_OPENAI_UPSTREAM, DEFAULT_PORT, ProxyConfig
 from reel.proxy.server import serve
+from reel.redact import contains_pii, contains_secret, redact_entry
 
 app = typer.Typer(
     name="reel",
@@ -169,6 +171,79 @@ def auto(
 def version() -> None:
     """Print the installed Reel version."""
     typer.echo(f"reel {__version__}")
+
+
+@app.command()
+def redact(
+    cassette: CassetteOpt,
+    keep_pii: Annotated[
+        bool,
+        typer.Option(
+            "--keep-pii",
+            help="Don't scrub PII (emails / phone numbers). Secrets are always scrubbed.",
+        ),
+    ] = False,
+    output: Annotated[
+        Path | None,
+        typer.Option(
+            "--output",
+            "-o",
+            help="Write the redacted cassette here (default: overwrite the input).",
+        ),
+    ] = None,
+    dry_run: Annotated[
+        bool,
+        typer.Option("--dry-run", help="Don't write — report what would change."),
+    ] = False,
+) -> None:
+    """Scrub secrets (and optionally PII) from an existing cassette."""
+    if not cassette.exists():
+        console.print(f"[bold red]error[/] cassette not found: {cassette}")
+        raise typer.Exit(code=2)
+
+    reader = CassetteReader(cassette)
+    raw_text = cassette.read_text(encoding="utf-8")
+    entries = reader.load_all()
+    meta = reader.read_meta()
+
+    scrub_pii = not keep_pii
+    changed = 0
+    scrubbed_entries: list[str] = []
+    for entry in entries:
+        cleaned = redact_entry(entry, scrub_pii=scrub_pii)
+        scrubbed_entries.append(cleaned.model_dump_json())
+        if cleaned.response.model_dump() != entry.response.model_dump():
+            changed += 1
+
+    secret_count = sum(
+        1 for line in raw_text.splitlines() if line.strip() and contains_secret(line)
+    )
+    pii_count = (
+        sum(1 for line in raw_text.splitlines() if line.strip() and contains_pii(line))
+        if scrub_pii
+        else 0
+    )
+
+    console.print(f"[bold magenta]reel[/] redact · [cyan]{cassette}[/]")
+    console.print(f"  entries:        {len(entries)}")
+    console.print(f"  containing secrets: {secret_count}")
+    if scrub_pii:
+        console.print(f"  containing PII:     {pii_count}")
+    console.print(f"  entries changed:    {changed}")
+
+    if dry_run:
+        console.print("[yellow]dry-run — no file written[/]")
+        return
+
+    target = output or cassette
+    lines: list[str] = []
+    if meta is not None:
+        import json as _json
+
+        lines.append(_json.dumps({"_meta": meta.model_dump(exclude_none=True)}))
+    lines.extend(scrubbed_entries)
+    target.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    console.print(f"[bold green]wrote {target}[/]  ({len(scrubbed_entries)} entries)")
 
 
 @app.command()
