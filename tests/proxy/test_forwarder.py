@@ -1,9 +1,13 @@
 """Sprint 1.2 — transparent forwarding via the proxy.
 
-Uses respx to mock the upstream so CI never touches a real LLM API.
+Uses respx to mock the upstream so CI never touches a real LLM API. From
+Sprint 1.6 onward the proxy requires a mode + cassette; we use record mode
+with a temp cassette to exercise the forward path with minimal side effect.
 """
 
 from __future__ import annotations
+
+from pathlib import Path
 
 import httpx
 import pytest
@@ -17,8 +21,12 @@ UPSTREAM = "https://api.openai.com"
 
 
 @pytest.fixture
-def app_client() -> TestClient:
-    cfg = ProxyConfig(openai_upstream=UPSTREAM)
+def app_client(tmp_path: Path) -> TestClient:
+    cfg = ProxyConfig(
+        mode="record",
+        cassette_path=str(tmp_path / "tape.jsonl"),
+        openai_upstream=UPSTREAM,
+    )
     return TestClient(create_app(cfg))
 
 

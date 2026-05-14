@@ -22,6 +22,7 @@ from starlette.responses import JSONResponse, Response
 from starlette.routing import Route
 
 from reel import __version__
+from reel.cassette.store import Cassette
 from reel.proxy.config import ProxyConfig
 from reel.proxy.forwarder import proxy as proxy_handler
 from reel.proxy.router import Router
@@ -72,6 +73,7 @@ def create_app(config: ProxyConfig | None = None) -> Starlette:
     )
     app.state.config = cfg
     app.state.router = Router.from_config(cfg)
+    app.state.cassette = Cassette(cfg.cassette_path) if cfg.cassette_path else None
     return app
 
 

@@ -1,13 +1,24 @@
-"""Transparent HTTP forwarding to the upstream.
+"""HTTP forwarding primitives.
 
-Sprint 1.2 ships a *non-streaming* forwarder: it fully buffers the upstream
-response before returning it. Streaming (SSE) replaces the buffered path in
-Sprint 2 and adds chunk-level capture for replay.
+The forwarder is split into three layers so record / replay / auto modes can
+share them without re-reading the request body:
+
+1. :func:`forward_with_body` — given a pre-extracted (method, path, query,
+   headers, body), return a :class:`ForwardResult` (status, headers, body).
+2. :func:`response_from_result` — turn a result back into a Starlette
+   :class:`Response`.
+3. :func:`forward_request` — convenience that ties the two together for the
+   plain transparent-proxy code path.
+
+Sprint 1.2 ships non-streaming forwarding only. Streaming (SSE) replaces the
+buffered path in Sprint 2.1 and adds chunk capture for replay.
 """
 
 from __future__ import annotations
 
+import json
 from collections.abc import Mapping
+from dataclasses import dataclass
 
 import httpx
 from starlette.requests import Request
@@ -36,6 +47,17 @@ HOP_BY_HOP: frozenset[str] = frozenset(
 RESPONSE_STRIP: frozenset[str] = HOP_BY_HOP | frozenset({"content-encoding", "content-length"})
 
 
+@dataclass(frozen=True, slots=True)
+class ForwardResult:
+    """The byte-level outcome of one upstream call."""
+
+    request_body: bytes
+    response_status: int
+    response_body: bytes
+    response_headers: dict[str, str]
+    response_media_type: str | None
+
+
 def _strip_request_headers(headers: Mapping[str, str]) -> dict[str, str]:
     return {k: v for k, v in headers.items() if k.lower() not in HOP_BY_HOP | {"host"}}
 
@@ -44,11 +66,67 @@ def _strip_response_headers(headers: Mapping[str, str]) -> dict[str, str]:
     return {k: v for k, v in headers.items() if k.lower() not in RESPONSE_STRIP}
 
 
-def _build_upstream_url(upstream: Upstream, request: Request) -> str:
-    target = upstream.base_url.rstrip("/") + request.url.path
-    if request.url.query:
-        target = f"{target}?{request.url.query}"
+def _build_upstream_url(upstream: Upstream, path: str, query: str) -> str:
+    target = upstream.base_url.rstrip("/") + path
+    if query:
+        target = f"{target}?{query}"
     return target
+
+
+async def forward_with_body(
+    *,
+    method: str,
+    path: str,
+    query: str,
+    headers: Mapping[str, str],
+    body: bytes,
+    http_client: httpx.AsyncClient,
+    upstream: Upstream,
+) -> ForwardResult:
+    """Forward one pre-extracted request upstream and return the captured result."""
+    target = _build_upstream_url(upstream, path, query)
+    filtered = _strip_request_headers(headers)
+
+    try:
+        upstream_resp = await http_client.request(
+            method,
+            target,
+            headers=filtered,
+            content=body,
+        )
+    except httpx.HTTPError as exc:
+        err_body = json.dumps(
+            {
+                "error": "reel: upstream request failed",
+                "detail": str(exc),
+                "upstream": target,
+            }
+        ).encode("utf-8")
+        return ForwardResult(
+            request_body=body,
+            response_status=502,
+            response_body=err_body,
+            response_headers={"content-type": "application/json"},
+            response_media_type="application/json",
+        )
+
+    return ForwardResult(
+        request_body=body,
+        response_status=upstream_resp.status_code,
+        response_body=upstream_resp.content,
+        response_headers=_strip_response_headers(upstream_resp.headers),
+        response_media_type=upstream_resp.headers.get("content-type"),
+    )
+
+
+def response_from_result(result: ForwardResult) -> Response:
+    """Build a Starlette :class:`Response` from a :class:`ForwardResult`."""
+    return Response(
+        content=result.response_body,
+        status_code=result.response_status,
+        headers=result.response_headers,
+        media_type=result.response_media_type,
+    )
 
 
 async def forward_request(
@@ -56,41 +134,30 @@ async def forward_request(
     http_client: httpx.AsyncClient,
     upstream: Upstream,
 ) -> Response:
-    """Forward one request upstream, return the response. Non-streaming."""
-    target = _build_upstream_url(upstream, request)
-    headers = _strip_request_headers(request.headers)
+    """Convenience entry point — transparent forward (no capture, no replay)."""
     body = await request.body()
-
-    try:
-        upstream_resp = await http_client.request(
-            request.method,
-            target,
-            headers=headers,
-            content=body,
-        )
-    except httpx.HTTPError as exc:
-        return JSONResponse(
-            {
-                "error": "reel: upstream request failed",
-                "detail": str(exc),
-                "upstream": target,
-            },
-            status_code=502,
-        )
-
-    return Response(
-        content=upstream_resp.content,
-        status_code=upstream_resp.status_code,
-        headers=_strip_response_headers(upstream_resp.headers),
-        media_type=upstream_resp.headers.get("content-type"),
+    result = await forward_with_body(
+        method=request.method,
+        path=request.url.path,
+        query=request.url.query.decode("ascii") if isinstance(request.url.query, bytes) else str(
+            request.url.query
+        ),
+        headers=request.headers,
+        body=body,
+        http_client=http_client,
+        upstream=upstream,
     )
+    return response_from_result(result)
 
 
 async def proxy(request: Request) -> Response:
-    """Starlette catch-all handler. Routes via :class:`Router`, forwards otherwise."""
+    """Starlette catch-all handler — dispatches to the configured mode."""
+    # Import inside the handler to avoid an import cycle with proxy/modes/__init__.py
+    # (modes themselves import from forwarder).
+    from reel.proxy.modes import dispatch
+
     app = request.app
     router: Router = app.state.router
-    http_client: httpx.AsyncClient = app.state.http_client
 
     upstream = router.resolve(request.url.path)
     if upstream is None:
@@ -104,4 +171,4 @@ async def proxy(request: Request) -> Response:
             status_code=404,
         )
 
-    return await forward_request(request, http_client, upstream)
+    return await dispatch(request, upstream)
