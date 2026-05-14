@@ -17,7 +17,13 @@ from reel.cassette.store import Cassette
 from reel.cassette.writer import generate_id, now_iso
 from reel.proxy.forwarder import forward_with_body, response_from_result
 from reel.proxy.router import Upstream
-from reel.proxy.stream import StreamingCapture, open_streaming_upstream, stream_and_capture
+from reel.proxy.stream import (
+    StreamingCapture,
+    is_sse_response,
+    open_streaming_upstream,
+    read_all_and_close,
+    stream_and_capture,
+)
 
 
 async def capture_buffered(
@@ -69,7 +75,13 @@ async def capture_streaming(
     upstream: Upstream,
     cassette: Cassette,
 ) -> Response:
-    """Forward a streaming request and persist the captured chunks on clean completion."""
+    """Forward a streaming request and persist the captured chunks on clean completion.
+
+    Defensive fallback: if the upstream returns a non-SSE content-type (e.g.,
+    a JSON 429 error in response to ``stream: true``), drain the body and
+    persist a buffered cassette entry instead. Otherwise the cassette would
+    record zero chunks and the next replay would serve an empty stream.
+    """
     query = str(request.url.query) if request.url.query else ""
 
     upstream_resp, capture = await open_streaming_upstream(
@@ -81,6 +93,32 @@ async def capture_streaming(
         http_client=http_client,
         upstream=upstream,
     )
+
+    if not is_sse_response(capture.response_media_type):
+        body_bytes = await read_all_and_close(upstream_resp)
+        entry = CassetteEntry(
+            id=generate_id(),
+            ts=now_iso(),
+            provider=upstream.provider,
+            request=CassetteRequest(
+                method=request.method,
+                path=request.url.path,
+                fingerprint=fingerprint,
+                body=parse_for_storage(body),
+            ),
+            response=CassetteResponse(
+                status=capture.response_status,
+                headers=capture.response_headers,
+                body=parse_for_storage(body_bytes),
+            ),
+        )
+        await cassette.append(entry)
+        return Response(
+            content=body_bytes,
+            status_code=capture.response_status,
+            headers=capture.response_headers,
+            media_type=capture.response_media_type,
+        )
 
     async def stream_then_persist():
         async for chunk in stream_and_capture(upstream_resp, capture):

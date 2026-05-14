@@ -128,3 +128,19 @@ async def stream_and_capture(
         capture.completed = True
     finally:
         await upstream_resp.aclose()
+
+
+async def read_all_and_close(upstream_resp: httpx.Response) -> bytes:
+    """Drain an open streaming response into a bytes buffer; close it."""
+    pieces: list[bytes] = []
+    try:
+        async for chunk in upstream_resp.aiter_bytes():
+            pieces.append(chunk)
+    finally:
+        await upstream_resp.aclose()
+    return b"".join(pieces)
+
+
+def is_sse_response(media_type: str | None) -> bool:
+    """``True`` if the upstream content-type indicates Server-Sent Events."""
+    return media_type is not None and "text/event-stream" in media_type.lower()
