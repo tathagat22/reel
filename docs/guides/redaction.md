@@ -1,3 +1,8 @@
+---
+title: "Keep API keys and PII out of Reel cassettes — redaction guide"
+description: "How Reel scrubs API keys (OpenAI, Anthropic, Google, AWS, GitHub), Bearer tokens, emails, and phone numbers from cassettes at capture time. Includes the pre-commit hook that blocks unsafe commits."
+---
+
 # Redaction
 
 In this guide: how Reel keeps secrets and PII out of cassettes, and how to scrub anything that slipped through.

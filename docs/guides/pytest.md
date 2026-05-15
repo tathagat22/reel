@@ -1,3 +1,8 @@
+---
+title: "pytest + LLM APIs — record/replay OpenAI, Anthropic, Gemini tests with Reel"
+description: "Drop Reel's pytest plugin into an existing OpenAI / Anthropic / Gemini test suite to make it deterministic, free, and offline. A VCR.py / pytest-recording / pytest-httpx alternative that works at the HTTP layer."
+---
+
 # pytest
 
 In this guide: drop Reel into an existing OpenAI / Anthropic / Gemini pytest

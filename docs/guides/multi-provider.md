@@ -1,3 +1,8 @@
+---
+title: "OpenAI + Anthropic + Gemini on one Reel proxy — multi-provider setup"
+description: "Run OpenAI, Anthropic, and Gemini through a single Reel proxy port. Path-based auto-routing or explicit /openai, /anthropic, /gemini URL prefixes. One cassette can hold multiple providers."
+---
+
 # Multi-provider
 
 In this guide: run OpenAI, Anthropic, and Gemini through a single Reel proxy at the same time.

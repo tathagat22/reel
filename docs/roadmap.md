@@ -1,3 +1,8 @@
+---
+title: "Reel roadmap — shipped features and what's coming next"
+description: "What's already in Reel v0.1.0 (proxy, cassette format, pytest plugin, analytics CLI, redaction) and what's planned for v0.2 (reel run wrapper, zero-config onboarding, embedding cache, agentic tool-loop matching, Azure/Bedrock/Vertex adapters)."
+---
+
 # Roadmap
 
 Reel is built and shipped in well-scoped milestones. Everything below has been delivered.

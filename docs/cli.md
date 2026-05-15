@@ -1,3 +1,8 @@
+---
+title: "Reel CLI reference — record, replay, inspect, cost, diff, doctor"
+description: "Complete CLI reference for the `reel` command — record / replay / auto proxy modes, plus inspect, cost, diff, stats, redact, doctor, and ui subcommands. Options, examples, exit codes."
+---
+
 # CLI reference
 
 Every `reel` subcommand, its options, examples, and exit codes. Generated from `uv run reel --help` and cross-checked against `src/reel/cli/`.

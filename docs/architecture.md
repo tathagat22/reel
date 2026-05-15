@@ -1,3 +1,8 @@
+---
+title: "Reel architecture — HTTP proxy, cassette format, SSE streaming, smart matching"
+description: "How Reel works internally: the Starlette + httpx + uvicorn proxy core, JSONL cassette format, SSE streaming capture with millisecond timing fidelity, fingerprint-based smart matching, capture-time redaction."
+---
+
 # Architecture
 
 How Reel is put together. This page is written for someone who has never seen the repo.

@@ -1,3 +1,8 @@
+---
+title: "Getting started with Reel — record your first LLM cassette in 5 minutes"
+description: "Install Reel from PyPI, record a real OpenAI / Anthropic / Gemini call into a JSONL cassette, then replay it offline in ~3 ms. A five-minute, copy-paste walkthrough."
+---
+
 # Getting started
 
 In this guide: install Reel, record your first cassette, and replay it without touching the network — in under five minutes.

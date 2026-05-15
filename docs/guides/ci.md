@@ -1,3 +1,8 @@
+---
+title: "Run LLM tests in CI with $0 spend and no API key — Reel replay mode"
+description: "Run pytest against OpenAI / Anthropic / Gemini in GitHub Actions, GitLab CI, or CircleCI for $0 per run. Use Reel's replay mode to fail loud on uncaptured requests so you never accidentally hit a real API from CI."
+---
+
 # CI
 
 In this guide: run your LLM-touching tests on every push without an API key and without hitting the network.
