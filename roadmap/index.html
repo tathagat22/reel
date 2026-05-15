@@ -725,10 +725,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#shipped-sprints-0-5" class="md-nav__link">
+  <a href="#shipped-v010" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Shipped (Sprints 0-5)
+        Shipped — v0.1.0
       
     </span>
   </a>
@@ -736,21 +736,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#in-flight-sprint-6" class="md-nav__link">
+  <a href="#whats-next-not-yet-committed-to-a-release" class="md-nav__link">
     <span class="md-ellipsis">
       
-        In flight (Sprint 6)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#post-mvp-backlog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Post-MVP backlog
+        What's next (not yet committed to a release)
       
     </span>
   </a>
@@ -803,10 +792,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#shipped-sprints-0-5" class="md-nav__link">
+  <a href="#shipped-v010" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Shipped (Sprints 0-5)
+        Shipped — v0.1.0
       
     </span>
   </a>
@@ -814,21 +803,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#in-flight-sprint-6" class="md-nav__link">
+  <a href="#whats-next-not-yet-committed-to-a-release" class="md-nav__link">
     <span class="md-ellipsis">
       
-        In flight (Sprint 6)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#post-mvp-backlog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Post-MVP backlog
+        What's next (not yet committed to a release)
       
     </span>
   </a>
@@ -867,90 +845,79 @@
 
 
 <h1 id="roadmap">Roadmap<a class="headerlink" href="#roadmap" title="Permanent link">&para;</a></h1>
-<p>Reel is built sprint by sprint. The canonical, always-up-to-date plan lives in <a href="https://github.com/tathagat22/reel/blob/main/docs/SPRINT_SHEET.md"><code>docs/SPRINT_SHEET.md</code></a> in the repo. The summary below stays in sync sprint-by-sprint.</p>
-<h2 id="shipped-sprints-0-5">Shipped (Sprints 0-5)<a class="headerlink" href="#shipped-sprints-0-5" title="Permanent link">&para;</a></h2>
+<p>Reel is built and shipped in well-scoped milestones. Everything below has been delivered.</p>
+<h2 id="shipped-v010">Shipped — v0.1.0<a class="headerlink" href="#shipped-v010" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th>Sprint</th>
+<th>Milestone</th>
 <th>What landed</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>0</td>
-<td>Repo, license, CI, project scaffolding</td>
+<td>Foundation</td>
+<td>Repo, license, CI matrix on Python 3.11 / 3.12 / 3.13, project scaffolding</td>
 </tr>
 <tr>
-<td>1</td>
-<td>Core proxy, OpenAI adapter, <code>record</code> / <code>replay</code> / <code>auto</code>, cassette JSONL format</td>
+<td>Core proxy</td>
+<td>OpenAI adapter, <code>record</code> / <code>replay</code> / <code>auto</code> modes, JSONL cassette format</td>
 </tr>
 <tr>
-<td>2</td>
-<td>SSE streaming with millisecond timing fidelity, <code>--timing</code> modes</td>
+<td>Streaming</td>
+<td>SSE capture with millisecond timing fidelity, <code>--timing realtime / fast / slow=N</code></td>
 </tr>
 <tr>
-<td>3</td>
-<td>Anthropic + Gemini adapters, smart matcher (<code>exact</code> / <code>normalized</code> / <code>ignore-fields</code> / <code>fuzzy</code>), secret + PII redaction, pre-commit hook</td>
+<td>Multi-provider</td>
+<td>Anthropic + Gemini adapters, path-based and explicit prefix routing</td>
 </tr>
 <tr>
-<td>4</td>
-<td>pytest plugin (auto-registered), <code>@cassette</code> decorator, <code>--reel-mode</code> CLI flag, example projects</td>
+<td>Smart matching</td>
+<td><code>exact</code> / <code>normalized</code> / <code>ignore-fields</code> / <code>fuzzy</code> (optional sentence-transformers)</td>
 </tr>
 <tr>
-<td>5</td>
-<td>Analytics CLI: <code>reel inspect / cost / diff / stats / doctor</code>, structured JSON per-request logs</td>
+<td>Redaction</td>
+<td>Capture-time secret + PII scrubbing, post-hoc <code>reel redact</code>, pre-commit hook</td>
+</tr>
+<tr>
+<td>pytest plugin</td>
+<td>Auto-registered via <code>pytest11</code>, <code>reel_cassette</code> fixture, <code>@cassette</code> decorator, <code>--reel-mode</code></td>
+</tr>
+<tr>
+<td>Analytics CLI</td>
+<td><code>reel inspect / cost / diff / stats / doctor</code> over cassette JSONL</td>
+</tr>
+<tr>
+<td>Observability</td>
+<td>Structured per-request JSON logs (<code>--log-format json</code>)</td>
+</tr>
+<tr>
+<td>Web inspector</td>
+<td><code>reel ui</code> — local HTMX cassette browser</td>
+</tr>
+<tr>
+<td>Distribution</td>
+<td>PyPI publish via Trusted Publishing, docs site on GitHub Pages, Homebrew formula scaffold</td>
 </tr>
 </tbody>
 </table>
 <p>See the <a href="../architecture/">architecture overview</a> for how the pieces fit together.</p>
-<h2 id="in-flight-sprint-6">In flight (Sprint 6)<a class="headerlink" href="#in-flight-sprint-6" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>ID</th>
-<th>Task</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>6.1-6.3</td>
-<td>Web inspector UI (HTMX, no SPA)</td>
-</tr>
-<tr>
-<td>6.4</td>
-<td>Docs site (this site)</td>
-</tr>
-<tr>
-<td>6.5</td>
-<td>Landing page polish</td>
-</tr>
-<tr>
-<td>6.6</td>
-<td>60-second demo video</td>
-</tr>
-<tr>
-<td>6.7-6.9</td>
-<td>Launch posts, newsletter outreach, maintainer outreach</td>
-</tr>
-<tr>
-<td>6.10</td>
-<td>PyPI + Homebrew formula</td>
-</tr>
-</tbody>
-</table>
-<h2 id="post-mvp-backlog">Post-MVP backlog<a class="headerlink" href="#post-mvp-backlog" title="Permanent link">&para;</a></h2>
+<h2 id="whats-next-not-yet-committed-to-a-release">What's next (not yet committed to a release)<a class="headerlink" href="#whats-next-not-yet-committed-to-a-release" title="Permanent link">&para;</a></h2>
+<p>These are tracked as ideas; comment on a GitHub issue if you'd use any of them and want to push them up the queue.</p>
 <ul>
-<li>TypeScript SDK + vitest plugin</li>
-<li>Tool-call multi-turn matching for agent loops</li>
-<li>Auto-instrumentation packages for LangChain / LlamaIndex / AI SDK</li>
-<li>Mutation testing on captured prompts</li>
-<li>Snapshot mode (assert shape, not content)</li>
-<li>More provider adapters: Bedrock, Vertex, Azure OpenAI, Mistral, Groq, Cerebras, Together</li>
-<li>Optional hosted dashboard for team cassette sharing (Reel Cloud)</li>
+<li><strong>Zero-config onboarding</strong> — <code>reel up</code> / <code>reel down</code> / <code>eval "$(reel env)"</code> so users never set env vars by hand.</li>
+<li><strong><code>reel run -- &lt;cmd&gt;</code></strong> — wrapper that auto-spawns the proxy for one subprocess and tears it down on exit.</li>
+<li><strong>Embedding-cache mode</strong> — transparent dedupe of <code>/v1/embeddings</code> calls (model-keyed, cross-session). Pure win, zero risk.</li>
+<li><strong>MCP server</strong> — exposes <code>lookup_cassette</code> / <code>report_savings</code> / <code>embed_cached</code> as tools that agents can wire in deliberately.</li>
+<li><strong>TypeScript SDK + vitest plugin</strong></li>
+<li><strong>Auto-instrumentation packages for LangChain / LlamaIndex / AI SDK</strong></li>
+<li><strong>Tool-call multi-turn matching for agent loops</strong></li>
+<li><strong>Snapshot mode</strong> — assert response shape rather than exact content</li>
+<li><strong>More provider adapters</strong>: Bedrock, Vertex, Azure OpenAI, Mistral, Groq, Cerebras, Together</li>
+<li><strong>Reel Cloud (eventually)</strong> — team cassette sharing + dashboards, only if there's demand</li>
 </ul>
 <h2 id="contributing">Contributing<a class="headerlink" href="#contributing" title="Permanent link">&para;</a></h2>
-<p>PRs welcome. See <a href="https://github.com/tathagat22/reel/blob/main/CONTRIBUTING.md"><code>CONTRIBUTING.md</code></a>. The sprint sheet is the source of truth for what's in flight — pick the lowest open ID in the current sprint.</p>
+<p>PRs welcome. See <a href="https://github.com/tathagat22/reel/blob/main/CONTRIBUTING.md"><code>CONTRIBUTING.md</code></a>.</p>
 
 
 
