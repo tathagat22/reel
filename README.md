@@ -113,6 +113,8 @@ For multi-provider apps in a single session, use the explicit URL prefix: `http:
 | **Reel** | HTTP proxy | Yes (any language) | ✅ with timing fidelity | No — it's language-agnostic |
 | **VCR.py / pytest-recording / pytest-vcr** | Monkey-patches urllib3 / requests | No (Python only) | Partial | Yes — breaks on transport changes |
 | **respx / pytest-httpx** | Mocks httpx at the client layer | Python only | Limited | Yes |
+| **llm-test-harness** | Wraps the SDK in Python (`harness.wrap(client)`) | No (Python only) | Limited | Yes — coupled to specific SDK clients |
+| **agent-vcr** | Records JSON-RPC for **MCP** servers (different layer entirely) | n/a — MCP, not LLM HTTP | n/a | n/a |
 | **Hand-rolled mocks** | Inside your code | No | Whatever you implement | Whenever you forget to update them |
 | **WireMock / MockServer** | HTTP proxy (Java) | Yes | Manual fixtures | Generic, not LLM-aware |
 
@@ -159,6 +161,13 @@ Deeper dive: [docs/architecture.md](docs/architecture.md). Roadmap: [docs/roadma
 ### Is this just VCR.py with extra steps?
 
 No. VCR.py and pytest-recording monkey-patch Python HTTP clients (`urllib3`, `requests`, `httpx`). When OpenAI or Anthropic ship a new SDK with a different transport, those tools silently break. Reel is an HTTP proxy — it sees the actual bytes on the wire, no matter what client sent them, no matter what language. It also works with non-Python clients (Cursor, Aider's Go bits, your TypeScript scripts).
+
+### How is Reel different from `llm-test-harness` and `agent-vcr`?
+
+Both are recent (early 2026) and in adjacent territory; neither does the same thing as Reel:
+
+- **`llm-test-harness`** wraps the SDK at the Python client level (`harness.wrap(anthropic.Anthropic())`) and bundles eval scoring + regression metrics. Same fundamental shape as VCR.py — Python-only, coupled to specific SDK clients, breaks if a vendor changes its transport. Reel sits one layer below that as a language-agnostic HTTP proxy, and stays out of eval/scoring on purpose (use whatever eval framework you already like).
+- **`agent-vcr`** records JSON-RPC for **MCP** (Model Context Protocol) servers — a different layer entirely from LLM HTTP APIs. Complementary to Reel rather than competing: agent-vcr cassettes your MCP tool servers, Reel cassettes the actual LLM calls underneath.
 
 ### Will it work with my coding agent — Claude Code, Aider, opencode, Cursor?
 

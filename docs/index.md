@@ -60,6 +60,8 @@ Diff cassettes in PRs. Grep them. Share them. They're regular files.
 | **Reel** | HTTP proxy | ✅ Yes (any language) | ✅ With timing fidelity | ✅ Yes — transport-agnostic |
 | VCR.py / pytest-recording / pytest-vcr | Monkey-patches `urllib3` / `requests` | ❌ Python only | Partial | ❌ Breaks when SDK changes transport |
 | respx / pytest-httpx | Mocks `httpx` clients | ❌ Python only | Limited | ❌ Coupled to httpx |
+| llm-test-harness | Wraps the SDK in Python (`harness.wrap(...)`) — bundles eval scoring | ❌ Python only | Limited | ❌ Coupled to specific SDK clients |
+| agent-vcr | Records JSON-RPC for MCP servers (different layer entirely) | n/a — MCP, not LLM HTTP | n/a | n/a |
 | WireMock / MockServer | HTTP proxy (Java) | ✅ Yes | Manual fixtures | ✅ Generic, not LLM-aware |
 | Hand-rolled mocks | Inside your code | ❌ | Whatever you write | ❌ Whenever you forget to update them |
 
@@ -96,6 +98,9 @@ Or jump to a specific topic:
 
 **Is this just VCR.py with extra steps?**
 No. VCR.py monkey-patches Python HTTP clients. When OpenAI or Anthropic ship a new SDK with a different transport, VCR.py silently breaks. Reel is an HTTP proxy — it sees the actual bytes on the wire, language-agnostic, SDK-agnostic.
+
+**How is Reel different from `llm-test-harness` and `agent-vcr`?**
+`llm-test-harness` wraps the SDK at the Python client level and bundles eval scoring — same Python-only / SDK-coupled shape as VCR.py. Reel sits one layer below as a language-agnostic HTTP proxy, and stays out of eval/scoring on purpose. `agent-vcr` records JSON-RPC for **MCP** servers (a different layer entirely) — it's complementary to Reel, not competitive: cassette your MCP tool servers with agent-vcr, cassette the LLM calls underneath with Reel.
 
 **Will it work with Claude Code, Aider, opencode, Cursor, Codex CLI?**
 Yes. All of them respect the standard `OPENAI_API_BASE` / `ANTHROPIC_BASE_URL` env-var convention. Cursor needs one settings-file line. Verified live with Claude Code, opencode, and Aider.
