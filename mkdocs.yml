@@ -1,0 +1,71 @@
+site_name: Reel
+site_description: "VCR for LLM APIs — record and replay OpenAI/Anthropic/Gemini calls"
+site_url: https://tathagat22.github.io/reel/
+repo_url: https://github.com/tathagat22/reel
+repo_name: tathagat22/reel
+edit_uri: edit/main/docs/
+
+docs_dir: docs
+
+# Files that live in docs/ but are not part of the site nav.
+# SPRINT_SHEET.md and demos/ are kept in-repo as source-of-truth artefacts.
+not_in_nav: |
+  SPRINT_SHEET.md
+  demos/*
+
+theme:
+  name: material
+  features:
+    - navigation.instant
+    - navigation.tabs
+    - navigation.sections
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+    - search.suggest
+    - search.highlight
+    - toc.follow
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: deep purple
+      accent: deep purple
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: deep purple
+      accent: deep purple
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+  icon:
+    repo: fontawesome/brands/github
+
+nav:
+  - Home: index.md
+  - Getting Started: getting-started.md
+  - Guides:
+      - pytest: guides/pytest.md
+      - CI: guides/ci.md
+      - Multi-provider: guides/multi-provider.md
+      - Redaction: guides/redaction.md
+  - CLI Reference: cli.md
+  - Architecture: architecture.md
+  - Roadmap: roadmap.md
+
+plugins:
+  - search
+
+markdown_extensions:
+  - admonition
+  - codehilite
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.details
+  - toc:
+      permalink: true

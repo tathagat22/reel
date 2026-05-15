@@ -126,9 +126,9 @@
 
 | ID | Task | Deliverable | DoD | Status |
 |----|------|-------------|-----|--------|
-| 6.1 | Web inspector backend (`reel ui` on `:7879`) | `inspector/server.py` | Lists / loads / displays | `[ ]` |
-| 6.2 | Web inspector frontend (HTMX + Pico.css, no SPA) | `inspector/templates/` | Loads <500ms | `[ ]` |
-| 6.3 | Search & filter in UI | UI components | Works on 10k entries | `[ ]` |
+| 6.1 | Web inspector backend (`reel ui` on `:7879`) | `inspector/server.py` | Lists / loads / displays | `[x]` |
+| 6.2 | Web inspector frontend (HTMX + Pico.css, no SPA) | `inspector/templates/` | Loads <500ms | `[x]` |
+| 6.3 | Search & filter in UI | UI components | Works on 10k entries | `[x]` |
 | 6.4 | Docs site (mkdocs-material, dark mode, search) | `docs/` on GH Pages | Deployed | `[ ]` |
 | 6.5 | Landing page (hero, video, install) | `docs/index.md` | Mobile + desktop | `[ ]` |
 | 6.6 | 60-sec demo video | Embedded | Linked in launch posts | `[ ]` |

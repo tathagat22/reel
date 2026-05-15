@@ -1,7 +1,7 @@
-# Add Reel to your pytest suite in 60 seconds
+# pytest
 
-This guide assumes you already have an OpenAI / Anthropic / Gemini SDK test
-suite and want to make it deterministic, free, and offline.
+In this guide: drop Reel into an existing OpenAI / Anthropic / Gemini pytest
+suite to make it deterministic, free, and offline — in under sixty seconds.
 
 ## 1. Install Reel
 
@@ -107,8 +107,13 @@ One line per exchange. Append-only. Diff-friendly.
 
 ## See also
 
-* `reel inspect <cassette>` — pretty-print a recorded session *(Sprint 5)*
-* `reel diff <a> <b>` — diff two cassettes *(Sprint 5)*
+* `reel inspect <cassette>` — pretty-print a recorded session
+* `reel diff <a> <b>` — diff two cassettes
 * `reel redact -c <cassette>` — post-hoc scrub
-* [Architecture overview](../../ARCHITECTURE.md)
-* [Sprint sheet / roadmap](../SPRINT_SHEET.md)
+* [Architecture overview](../architecture.md)
+* [Roadmap](../roadmap.md)
+
+## Next
+
+- [Use replay mode in CI](ci.md)
+- [Keep secrets out of cassettes](redaction.md)
