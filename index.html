@@ -977,6 +977,20 @@
 <td>❌ Coupled to httpx</td>
 </tr>
 <tr>
+<td>llm-test-harness</td>
+<td>Wraps the SDK in Python (<code>harness.wrap(...)</code>) — bundles eval scoring</td>
+<td>❌ Python only</td>
+<td>Limited</td>
+<td>❌ Coupled to specific SDK clients</td>
+</tr>
+<tr>
+<td>agent-vcr</td>
+<td>Records JSON-RPC for MCP servers (different layer entirely)</td>
+<td>n/a — MCP, not LLM HTTP</td>
+<td>n/a</td>
+<td>n/a</td>
+</tr>
+<tr>
 <td>WireMock / MockServer</td>
 <td>HTTP proxy (Java)</td>
 <td>✅ Yes</td>
@@ -1021,6 +1035,8 @@
 <h2 id="frequently-asked">Frequently asked<a class="headerlink" href="#frequently-asked" title="Permanent link">&para;</a></h2>
 <p><strong>Is this just VCR.py with extra steps?</strong>
 No. VCR.py monkey-patches Python HTTP clients. When OpenAI or Anthropic ship a new SDK with a different transport, VCR.py silently breaks. Reel is an HTTP proxy — it sees the actual bytes on the wire, language-agnostic, SDK-agnostic.</p>
+<p><strong>How is Reel different from <code>llm-test-harness</code> and <code>agent-vcr</code>?</strong>
+<code>llm-test-harness</code> wraps the SDK at the Python client level and bundles eval scoring — same Python-only / SDK-coupled shape as VCR.py. Reel sits one layer below as a language-agnostic HTTP proxy, and stays out of eval/scoring on purpose. <code>agent-vcr</code> records JSON-RPC for <strong>MCP</strong> servers (a different layer entirely) — it's complementary to Reel, not competitive: cassette your MCP tool servers with agent-vcr, cassette the LLM calls underneath with Reel.</p>
 <p><strong>Will it work with Claude Code, Aider, opencode, Cursor, Codex CLI?</strong>
 Yes. All of them respect the standard <code>OPENAI_API_BASE</code> / <code>ANTHROPIC_BASE_URL</code> env-var convention. Cursor needs one settings-file line. Verified live with Claude Code, opencode, and Aider.</p>
 <p><strong>What about API keys in committed cassettes?</strong>
