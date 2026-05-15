@@ -129,13 +129,13 @@
 | 6.1 | Web inspector backend (`reel ui` on `:7879`) | `inspector/server.py` | Lists / loads / displays | `[x]` |
 | 6.2 | Web inspector frontend (HTMX + Pico.css, no SPA) | `inspector/templates/` | Loads <500ms | `[x]` |
 | 6.3 | Search & filter in UI | UI components | Works on 10k entries | `[x]` |
-| 6.4 | Docs site (mkdocs-material, dark mode, search) | `docs/` on GH Pages | Deployed | `[ ]` |
-| 6.5 | Landing page (hero, video, install) | `docs/index.md` | Mobile + desktop | `[ ]` |
-| 6.6 | 60-sec demo video | Embedded | Linked in launch posts | `[ ]` |
-| 6.7 | Launch posts (HN, Twitter, Bluesky, Reddit) drafts | `marketing/launch/*.md` | Ready to copy-paste | `[ ]` |
-| 6.8 | Newsletter outreach list | `marketing/outreach.csv` | 10+ contacts | `[ ]` |
-| 6.9 | Maintainer outreach (LangChain, LlamaIndex, instructor, dspy, AI SDK) | DMs/issues drafted | 5+ sent on launch day | `[ ]` |
-| 6.10 | PyPI + Homebrew formula | Packages published | Install works from clean env | `[ ]` |
+| 6.4 | Docs site (mkdocs-material, dark mode, search) | `docs/` + `mkdocs.yml` on GH Pages | Deployed | `[x]` |
+| 6.5 | Landing page (hero, video, install) | `README.md` + `docs/index.md` | Mobile + desktop | `[x]` |
+| 6.6 | 60-sec demo video | `docs/demos/` placeholder | Linked in launch posts | `[ ]` *(deferred — manual recording)* |
+| 6.7 | Launch posts (HN, Twitter, Bluesky, Reddit) drafts | `marketing/launch/*.md` | Ready to copy-paste | `[x]` |
+| 6.8 | Newsletter outreach list | `marketing/outreach.csv` | 10+ contacts | `[x]` |
+| 6.9 | Maintainer outreach (LangChain, LlamaIndex, instructor, dspy, AI SDK) | `marketing/maintainer-outreach.md` | Templates ready; sends are manual | `[x]` |
+| 6.10 | PyPI + Homebrew formula | Workflow + formula + runbook | Tag `v0.1.0` to publish | `[x]` |
 
 **Sprint 6 DoD:** Launch day ships. Installable, demoable, discoverable.
 
