@@ -6,7 +6,7 @@ suite to make it deterministic, free, and offline — in under sixty seconds.
 ## 1. Install Reel
 
 ```bash
-uv pip install reel        # or: pip install reel
+uv pip install reel-vcr    # or: pip install reel-vcr  (binary + import path stay `reel`)
 ```
 
 The package ships a pytest plugin that auto-registers — no `conftest.py`

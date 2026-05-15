@@ -45,13 +45,18 @@ your code  ─►  127.0.0.1:7878  ─►  reel proxy  ─►  api.openai.com
 ## Quickstart
 
 ```bash
+# From PyPI once v0.1.0 is published:
+pip install reel-vcr                # distribution name is reel-vcr;
+                                     # binary + import path stay `reel`
+# Or from source today:
 git clone https://github.com/tathagat22/reel && cd reel && uv sync
+
 uv run reel auto -c demo.jsonl &
 export OPENAI_BASE_URL=http://127.0.0.1:7878/v1
 python -c "from openai import OpenAI; print(OpenAI().chat.completions.create(model='gpt-5', messages=[{'role':'user','content':'Hi'}]).choices[0].message.content)"
 ```
 
-PyPI + Homebrew land at the v0.1 cut. Until then, install from source.
+> **Note:** the bare `reel` name on PyPI was already taken by an unrelated async-subprocess library, so the distribution name is **`reel-vcr`**. The CLI binary, GitHub repo, and Python import path (`import reel`) all stay as `reel`.
 
 ### Drop into an existing pytest suite
 

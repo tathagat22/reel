@@ -45,7 +45,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: pypi
-      url: https://pypi.org/p/reel
+      url: https://pypi.org/p/reel-vcr
     permissions:
       id-token: write   # required for PyPI Trusted Publishing
     steps:
@@ -76,6 +76,6 @@ jobs:
         run: |
           gh release create "$GITHUB_REF_NAME" \
             --title "Reel $GITHUB_REF_NAME" \
-            --notes "PyPI: https://pypi.org/project/reel/${GITHUB_REF_NAME#v}/" \
+            --notes "PyPI: https://pypi.org/project/reel-vcr/${GITHUB_REF_NAME#v}/" \
             --verify-tag \
             dist/*

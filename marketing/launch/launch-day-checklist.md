@@ -8,8 +8,8 @@
 
 - [ ] Final pass on README: typos, broken links, install instructions resolve.
 - [ ] Confirm `uv sync && make check` passes on a fresh clone (don't trust your dev machine).
-- [ ] Publish to PyPI as a release candidate (e.g. `0.0.1rc1`) and install in a clean venv: `uv pip install reel==0.0.1rc1 && reel --help`.
-- [ ] Tag the release commit (`v0.0.1`) but **do not push the tag yet** — push happens on launch morning so the timestamp matches the post.
+- [ ] Publish to PyPI as a release candidate (e.g. `0.1.0rc1`) and install in a clean venv: `uv pip install reel-vcr==0.1.0rc1 && reel --help`.
+- [ ] Tag the release commit (`v0.1.0`) but **do not push the tag yet** — push happens on launch morning so the timestamp matches the post.
 - [ ] Record the 60-second demo GIF (Sprint 2.9 — deferred but want it for launch). Embed it in README + landing page.
 - [ ] **Create GitHub issue templates** (`.github/ISSUE_TEMPLATE/bug.yml`, `feature.yml`, `question.yml`). Traffic will arrive within minutes of the HN post — bare-text issues are noisy and you won't have time to sort them on the day.
 - [ ] Add a `discussions` tab and seed it with 3 starter threads: "what should we adapter-add next?", "show your cassette workflow", "feedback wanted: pytest ergonomics".
@@ -38,8 +38,8 @@
 
 ### 7:30am PT — wake up, coffee, no scrolling
 
-- [ ] Final smoke test: `uv pip install reel && reel --help` in a fresh venv on one of the three machines.
-- [ ] Push the `v0.0.1` tag. Verify the GitHub release page is generated and the artifact is attached.
+- [ ] Final smoke test: `uv pip install reel-vcr && reel --help` in a fresh venv on one of the three machines.
+- [ ] Push the `v0.1.0` tag. Verify the GitHub release page is generated and the artifact is attached.
 - [ ] Update README badges (CI, license, Python, PyPI version). The PyPI badge should now resolve to a real version.
 
 ### 9:00am PT — Show HN

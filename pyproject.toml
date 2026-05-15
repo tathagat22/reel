@@ -1,5 +1,5 @@
 [project]
-name = "reel"
+name = "reel-vcr"
 version = "0.1.0"
 description = "VCR for LLM APIs — record and replay OpenAI/Anthropic/Gemini calls including streaming."
 readme = "README.md"

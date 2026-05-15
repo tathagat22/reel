@@ -3,7 +3,9 @@ class Reel < Formula
 
   desc "VCR for LLM APIs — record and replay OpenAI/Anthropic/Gemini calls"
   homepage "https://github.com/tathagat22/reel"
-  url "https://files.pythonhosted.org/packages/source/r/reel/reel-0.1.0.tar.gz"
+  # PyPI distribution is `reel-vcr` (the bare `reel` name was already taken on PyPI);
+  # the binary, GitHub repo, and Python import path are all still `reel`.
+  url "https://files.pythonhosted.org/packages/source/r/reel-vcr/reel_vcr-0.1.0.tar.gz"
   # sha256 is filled in by the release runbook after `uv build` of the v0.1.0 tag
   sha256 "REPLACE_WITH_SDIST_SHA256_AT_RELEASE_TIME"
   license "Apache-2.0"

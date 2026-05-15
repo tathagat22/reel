@@ -46,7 +46,7 @@ The formula at `Formula/reel.rb` is currently stubbed with `REPLACE` placeholder
 
 ```bash
 # 1. Get the sha256 of the published sdist
-curl -sL "https://files.pythonhosted.org/packages/source/r/reel/reel-0.1.0.tar.gz" | shasum -a 256
+curl -sL "https://files.pythonhosted.org/packages/source/r/reel-vcr/reel_vcr-0.1.0.tar.gz" | shasum -a 256
 
 # 2. Update Formula/reel.rb with that sdist sha256 (the resource shas are computed by `brew bump-formula-pr` automatically if you push to homebrew-core)
 $EDITOR Formula/reel.rb
@@ -61,7 +61,7 @@ To submit to `homebrew-core` (recommended once Reel has >50 GitHub stars or any 
 
 ```bash
 brew tap homebrew/core --force
-brew bump-formula-pr --strict --url=https://files.pythonhosted.org/packages/source/r/reel/reel-0.1.0.tar.gz reel
+brew bump-formula-pr --strict --url=https://files.pythonhosted.org/packages/source/r/reel-vcr/reel_vcr-0.1.0.tar.gz reel-vcr
 ```
 
 Until that happens, users can install from this repo with a manual `tap`:
@@ -91,8 +91,8 @@ git tag -d v0.1.0
 git push origin :v0.1.0
 gh release delete v0.1.0 --yes --cleanup-tag
 
-# 2. Yank the broken version on PyPI (still visible, but not picked by `pip install reel`)
-#    Done via the PyPI web UI: https://pypi.org/manage/project/reel/release/0.1.0/
+# 2. Yank the broken version on PyPI (still visible, but not picked by `pip install reel-vcr`)
+#    Done via the PyPI web UI: https://pypi.org/manage/project/reel-vcr/release/0.1.0/
 
 # 3. Bump to the next patch (e.g., 0.1.1), commit the fix, tag, re-run the flow.
 ```
