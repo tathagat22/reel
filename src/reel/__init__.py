@@ -9,6 +9,6 @@ Public test-side API lives at :mod:`reel.sdk` — the canonical import is::
 holds schema, reader, writer — already owns that attribute slot.)
 """
 
-__version__ = "0.0.1"
+__version__ = "0.1.0"
 
 __all__ = ["__version__"]
