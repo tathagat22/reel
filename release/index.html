@@ -826,7 +826,7 @@
 <h2 id="homebrew-formula-update">Homebrew formula update<a class="headerlink" href="#homebrew-formula-update" title="Permanent link">&para;</a></h2>
 <p>The formula at <code>Formula/reel.rb</code> is currently stubbed with <code>REPLACE</code> placeholders for <code>sha256</code> checksums. After the PyPI publish succeeds:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># 1. Get the sha256 of the published sdist</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>curl<span class="w"> </span>-sL<span class="w"> </span><span class="s2">&quot;https://files.pythonhosted.org/packages/source/r/reel/reel-0.1.0.tar.gz&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>shasum<span class="w"> </span>-a<span class="w"> </span><span class="m">256</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>curl<span class="w"> </span>-sL<span class="w"> </span><span class="s2">&quot;https://files.pythonhosted.org/packages/source/r/reel-vcr/reel_vcr-0.1.0.tar.gz&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>shasum<span class="w"> </span>-a<span class="w"> </span><span class="m">256</span>
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
 <a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1"># 2. Update Formula/reel.rb with that sdist sha256 (the resource shas are computed by `brew bump-formula-pr` automatically if you push to homebrew-core)</span>
 <a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="nv">$EDITOR</span><span class="w"> </span>Formula/reel.rb
@@ -838,7 +838,7 @@
 </code></pre></div>
 <p>To submit to <code>homebrew-core</code> (recommended once Reel has &gt;50 GitHub stars or any meaningful install base, per Homebrew's notability criteria):</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>brew<span class="w"> </span>tap<span class="w"> </span>homebrew/core<span class="w"> </span>--force
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>brew<span class="w"> </span>bump-formula-pr<span class="w"> </span>--strict<span class="w"> </span>--url<span class="o">=</span>https://files.pythonhosted.org/packages/source/r/reel/reel-0.1.0.tar.gz<span class="w"> </span>reel
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>brew<span class="w"> </span>bump-formula-pr<span class="w"> </span>--strict<span class="w"> </span>--url<span class="o">=</span>https://files.pythonhosted.org/packages/source/r/reel-vcr/reel_vcr-0.1.0.tar.gz<span class="w"> </span>reel-vcr
 </code></pre></div>
 <p>Until that happens, users can install from this repo with a manual <code>tap</code>:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>brew<span class="w"> </span>install<span class="w"> </span>tathagat22/reel/reel
@@ -861,8 +861,8 @@
 <a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>:v0.1.0
 <a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>gh<span class="w"> </span>release<span class="w"> </span>delete<span class="w"> </span>v0.1.0<span class="w"> </span>--yes<span class="w"> </span>--cleanup-tag
 <a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="c1"># 2. Yank the broken version on PyPI (still visible, but not picked by `pip install reel`)</span>
-<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="c1">#    Done via the PyPI web UI: https://pypi.org/manage/project/reel/release/0.1.0/</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="c1"># 2. Yank the broken version on PyPI (still visible, but not picked by `pip install reel-vcr`)</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="c1">#    Done via the PyPI web UI: https://pypi.org/manage/project/reel-vcr/release/0.1.0/</span>
 <a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>
 <a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="c1"># 3. Bump to the next patch (e.g., 0.1.1), commit the fix, tag, re-run the flow.</span>
 </code></pre></div>
