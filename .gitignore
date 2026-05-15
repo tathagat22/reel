@@ -58,3 +58,10 @@ Thumbs.db
 # Docs build
 site/
 docs/_build/
+
+# Internal-only working docs — kept on disk, never published.
+# Marketing drafts (HN post, Twitter thread, Reddit, outreach lists, maintainer DMs).
+marketing/
+# The sprint sheet is internal sprint-tracking; the public roadmap lives at
+# docs/roadmap.md.
+docs/SPRINT_SHEET.md

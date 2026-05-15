@@ -4,16 +4,20 @@ In this guide: install Reel, record your first cassette, and replay it without t
 
 ## 1. Install
 
-Reel is pre-alpha. Install from source with [uv](https://github.com/astral-sh/uv):
+From PyPI:
+
+```bash
+pip install reel-vcr            # CLI binary, import path, and GitHub repo all stay `reel`
+reel --help
+```
+
+Or from source if you want the latest unreleased commits:
 
 ```bash
 git clone https://github.com/tathagat22/reel
-cd reel
-uv sync
+cd reel && uv sync
 uv run reel --help
 ```
-
-PyPI and Homebrew packages land in Sprint 6.
 
 ## 2. Start the proxy in `auto` mode
 

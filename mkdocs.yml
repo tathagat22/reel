@@ -8,10 +8,9 @@ edit_uri: edit/main/docs/
 docs_dir: docs
 
 # Files that live in docs/ but are not part of the site nav.
-# SPRINT_SHEET.md and demos/ are kept in-repo as source-of-truth artefacts.
 not_in_nav: |
-  SPRINT_SHEET.md
   demos/*
+  release.md
 
 theme:
   name: material
