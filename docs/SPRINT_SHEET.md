@@ -63,7 +63,7 @@
 | 2.6 | Timing modes: `realtime`, `fast`, `slow Nx` | CLI flag `--timing` | Tests for each mode | `[x]` |
 | 2.7 | Handle stream interruptions / client disconnects | Error paths | No zombie tasks, no half-written cassettes | `[x]` |
 | 2.8 | E2E: real OpenAI streaming → record → replay → assert chunks equal | `tests/e2e/test_streaming.py` | Passes locally | `[x]` |
-| 2.9 | Demo GIF: pytest going from $5 → $0 with `--cassette` | `docs/demos/streaming.gif` | Embedded in README | `[ ]` *(deferred — manual recording)* |
+| 2.9 | Demo recording: end-to-end Reel walkthrough | `docs/demos/reel-demo.{gif,mp4}` | GIF in README hero, MP4 in docs landing | `[x]` |
 
 **Sprint 2 DoD:** Streaming replay is indistinguishable from a real call (timing + content).
 

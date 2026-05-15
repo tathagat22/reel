@@ -60,6 +60,8 @@ plugins:
 
 markdown_extensions:
   - admonition
+  - attr_list           # enables { .md-button .md-button--primary } class syntax
+  - md_in_html          # lets us drop <video>/<picture> blocks inside .md files
   - codehilite
   - pymdownx.highlight:
       anchor_linenums: true
@@ -67,5 +69,10 @@ markdown_extensions:
   - pymdownx.tabbed:
       alternate_style: true
   - pymdownx.details
+  # Renders :material-arrow-right:, :octicons-mark-github-16:, and other shortcodes
+  # via Material for MkDocs's bundled icon set.
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
   - toc:
       permalink: true

@@ -4,6 +4,8 @@
 
 No SDK lock-in. No real network in CI. No surprise spend.
 
+<video src="demos/reel-demo.mp4" controls muted loop playsinline preload="metadata" style="width:100%;max-width:900px;border-radius:8px;display:block;margin:1.5rem 0;"></video>
+
 ---
 
 ## Why this exists

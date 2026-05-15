@@ -9,6 +9,8 @@
 
 > Docs: **<https://tathagat22.github.io/reel/>**
 
+![Reel — record once, replay forever](docs/demos/reel-demo.gif)
+
 ---
 
 ## The 30-second pitch
