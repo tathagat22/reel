@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}reel inspector · {{ cassette_path }}{% endblock %}
+{% block banner_path %}{{ cassette_path }}{% endblock %}
+{% block banner_count %}{{ total }} entr{{ 'y' if total == 1 else 'ies' }}{% endblock %}
+
+{% block content %}
+<form class="reel-filters"
+      hx-get="/entries"
+      hx-target="#rows"
+      hx-trigger="input changed delay:200ms from:form, change from:form"
+      hx-push-url="true">
+  <input type="text" name="provider" placeholder="provider"
+         value="{{ filters.provider }}" aria-label="provider">
+  <input type="text" name="model" placeholder="model substring"
+         value="{{ filters.model }}" aria-label="model">
+  <input type="text" name="status" placeholder="status (4xx, 429)"
+         value="{{ filters.status }}" aria-label="status">
+  <select name="has_tool_call" aria-label="tool calls">
+    <option value="" {% if filters.has_tool_call == "" %}selected{% endif %}>any tools</option>
+    <option value="true" {% if filters.has_tool_call == "true" %}selected{% endif %}>has tool call</option>
+    <option value="false" {% if filters.has_tool_call == "false" %}selected{% endif %}>no tool call</option>
+  </select>
+  <input type="text" name="regex" placeholder="regex"
+         value="{{ filters.regex }}" aria-label="regex">
+  <input type="number" name="limit" placeholder="limit" min="1"
+         value="{{ filters.limit }}" aria-label="limit">
+</form>
+
+<section id="rows" class="reel-rows">
+  {% include "_rows.html" %}
+</section>
+{% endblock %}

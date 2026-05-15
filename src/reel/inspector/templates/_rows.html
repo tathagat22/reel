@@ -1,0 +1,35 @@
+<table class="reel-table">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">ts</th>
+      <th scope="col">provider</th>
+      <th scope="col">method</th>
+      <th scope="col">path</th>
+      <th scope="col">model</th>
+      <th scope="col">status</th>
+      <th scope="col">tokens</th>
+      <th scope="col">summary</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in rows %}
+    <tr class="reel-row" onclick="window.location='/entries/{{ row.idx }}'">
+      <td class="reel-cell-dim">{{ row.idx }}</td>
+      <td class="reel-cell-dim">{{ row.short_ts }}</td>
+      <td>{{ row.provider }}</td>
+      <td>{{ row.method }}</td>
+      <td><code>{{ row.path }}</code></td>
+      <td>{{ row.model }}</td>
+      <td><span class="badge badge--{{ row.status_class }}">{{ row.status }}</span></td>
+      <td>{{ row.tokens }}</td>
+      <td class="reel-cell-summary">{{ row.summary }}</td>
+    </tr>
+    {% else %}
+    <tr>
+      <td colspan="9" class="reel-empty">no entries match</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<p class="reel-match-count">{{ matched }} of {{ total }} entr{{ 'y' if total == 1 else 'ies' }} matched</p>

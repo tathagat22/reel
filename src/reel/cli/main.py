@@ -19,6 +19,7 @@ from reel.cli.commands import diff as diff_cmd
 from reel.cli.commands import doctor as doctor_cmd
 from reel.cli.commands import inspect as inspect_cmd
 from reel.cli.commands import stats as stats_cmd
+from reel.cli.commands import ui as ui_cmd
 from reel.proxy.config import DEFAULT_HOST, DEFAULT_OPENAI_UPSTREAM, DEFAULT_PORT, ProxyConfig
 from reel.proxy.server import serve
 from reel.redact import contains_pii, contains_secret, redact_entry
@@ -201,6 +202,7 @@ app.command(name="cost")(cost_cmd.run)
 app.command(name="diff")(diff_cmd.run)
 app.command(name="stats")(stats_cmd.run)
 app.command(name="doctor")(doctor_cmd.run)
+app.command(name="ui")(ui_cmd.run)
 
 
 @app.command()

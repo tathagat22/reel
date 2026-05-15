@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}reel inspector{% endblock %}</title>
+  <link rel="stylesheet" href="/static/pico.min.css">
+  <link rel="stylesheet" href="/static/custom.css">
+  <script src="https://unpkg.com/htmx.org@2.0.3" defer></script>
+</head>
+<body>
+  <main class="container-fluid">
+    <header class="reel-banner">
+      <strong>reel</strong>
+      <span class="reel-banner__sep">·</span>
+      <code class="reel-banner__path">{% block banner_path %}{% endblock %}</code>
+      <span class="reel-banner__sep">·</span>
+      <span class="reel-banner__count">{% block banner_count %}{% endblock %}</span>
+    </header>
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

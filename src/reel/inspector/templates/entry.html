@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}reel inspector · entry #{{ idx }}{% endblock %}
+{% block banner_path %}{{ cassette_path }}{% endblock %}
+{% block banner_count %}entry #{{ idx }} of {{ total }}{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb" class="reel-breadcrumb">
+  <a href="/">index</a> &raquo; <span>entry #{{ idx }}</span>
+</nav>
+
+<article class="reel-entry-meta">
+  <p>
+    <strong>{{ entry.provider }}</strong>
+    <code>{{ entry.request.method }} {{ entry.request.path }}</code>
+  </p>
+  <p>
+    <span class="reel-cell-dim">id:</span> <code>{{ entry.id }}</code>
+    <span class="reel-cell-dim">ts:</span> <code>{{ entry.ts }}</code>
+  </p>
+  <p>
+    <span class="reel-cell-dim">model:</span> {{ model }}
+    <span class="reel-cell-dim">status:</span>
+    <span class="badge badge--{{ status_class }}">{{ entry.response.status }}</span>
+    <span class="reel-cell-dim">tokens:</span> {{ tokens }}
+  </p>
+  <p>
+    <span class="reel-cell-dim">fingerprint:</span>
+    <code>{{ entry.request.fingerprint }}</code>
+  </p>
+</article>
+
+<section class="reel-detail">
+  <h3>request body</h3>
+  <pre class="reel-json">{{ entry.request.body | pretty_json }}</pre>
+</section>
+
+<section class="reel-detail">
+  <h3>response</h3>
+  {% if is_stream %}
+  <p class="reel-cell-dim">
+    {{ entry.response.stream_chunks | length }} streamed chunks
+    {% if entry.response.stream_chunks %}
+      · captured over {{ entry.response.stream_chunks[-1].t_offset_ms }}ms
+    {% endif %}
+  </p>
+  <ol class="reel-chunks">
+    {% for chunk in entry.response.stream_chunks %}
+    <li>
+      <span class="reel-cell-dim">+{{ chunk.t_offset_ms }}ms</span>
+      {% if chunk.event %}<span class="reel-cell-dim">[{{ chunk.event }}]</span>{% endif %}
+      <pre class="reel-json reel-json--inline">{{ chunk.data | pretty_json }}</pre>
+    </li>
+    {% endfor %}
+  </ol>
+  {% else %}
+  <pre class="reel-json">{{ entry.response.body | pretty_json }}</pre>
+  {% endif %}
+</section>
+{% endblock %}
