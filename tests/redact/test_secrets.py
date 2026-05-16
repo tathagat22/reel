@@ -57,6 +57,32 @@ def test_safe_text_passes_through() -> None:
     assert out == "this is a normal sentence with no secrets"
 
 
+def test_bearer_followed_by_short_english_word_is_not_redacted() -> None:
+    """The Bearer pattern must not eat ordinary English prose like ``Bearer
+    tokens``, ``Bearer is a header``, etc. Real bearer tokens are always
+    longer than 20 chars; the regex requires that floor so summaries and
+    documentation that mention bearer-token concepts pass through untouched."""
+    cases = [
+        "the Bearer tokens are scrubbed at capture time",
+        "headers like Bearer are stripped",
+        "Bearer is one HTTP auth scheme",
+        "Bearer abc",  # 3-char token — too short to be a real one
+    ]
+    for raw in cases:
+        out = redact_secrets(raw)
+        assert out == raw, f"unexpected redaction: {raw!r} -> {out!r}"
+        assert not contains_secret(raw), f"unexpected secret detected in {raw!r}"
+
+
+def test_long_bearer_token_still_redacted() -> None:
+    """Sanity check the floor — anything 20+ chars after ``Bearer `` is still
+    treated as a token, so we don't regress on the real-secret case."""
+    raw = "Authorization: Bearer FAKEFIXTURETOKENWITHTWENTYPLUSCHARS"
+    out = redact_secrets(raw)
+    assert "FAKEFIXTURETOKENWITHTWENTYPLUSCHARS" not in out
+    assert "Bearer [redacted]" in out
+
+
 def test_multiple_secrets_in_one_string() -> None:
     raw = f"{_FAKE_OPENAI} and {_FAKE_GITHUB_CLASSIC}"
     out = redact_secrets(raw)

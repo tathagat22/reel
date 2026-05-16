@@ -36,7 +36,11 @@ SECRET_PATTERNS: list[tuple[re.Pattern[str], str]] = [
     # Slack tokens.
     (re.compile(r"xox[baprs]-[A-Za-z0-9\-]+"), "[redacted:slack-token]"),
     # Generic Bearer header — case-insensitive prefix, captures everything after.
-    (re.compile(r"(?i)\bbearer\s+[A-Za-z0-9_\-\.=:+/]+"), "Bearer [redacted]"),
+    # The 20-char minimum on the token body avoids catching English prose like
+    # "Bearer tokens" or "Bearer is a method" when the response body explains
+    # what a Bearer token is. Real-world bearer tokens (JWTs, OAuth access
+    # tokens) are virtually always longer than 20 chars.
+    (re.compile(r"(?i)\bbearer\s+[A-Za-z0-9_\-\.=:+/]{20,}"), "Bearer [redacted]"),
 ]
 
 
