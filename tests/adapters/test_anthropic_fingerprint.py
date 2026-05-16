@@ -181,3 +181,36 @@ def test_different_skill_sets_still_fingerprint_differently_under_cc() -> None:
     a = _body(_cc_body(cch="abc", skills=["- s1", "- s2"]))
     b = _body(_cc_body(cch="abc", skills=["- s1", "- s2", "- s3"]))
     assert fingerprint(a, endpoint=MESSAGES_ENDPOINT) != fingerprint(b, endpoint=MESSAGES_ENDPOINT)
+
+
+def test_tools_array_is_dropped_for_claude_code() -> None:
+    """Claude Code lazy-loads MCP tools — the tools array shape varies between
+    invocations. We strip it from CC fingerprints so the same user prompt
+    matches across runs even when different MCP servers happen to be loaded."""
+    base = _cc_body(cch="abc", skills=["- s1"], user_text="hi")
+    a = dict(base)
+    a["tools"] = [{"name": "Read", "description": "read", "input_schema": {}}]
+    b = dict(base)
+    b["tools"] = [
+        {"name": "Read", "description": "read", "input_schema": {}},
+        {"name": "mcp__gmail__send", "description": "send mail", "input_schema": {}},
+    ]
+    assert fingerprint(_body(a), endpoint=MESSAGES_ENDPOINT) == fingerprint(
+        _body(b), endpoint=MESSAGES_ENDPOINT
+    )
+
+
+def test_tools_array_is_preserved_for_non_claude_code() -> None:
+    """Third-party Anthropic SDK apps register their own tool sets — those
+    affect what the model can do and must remain part of the fingerprint."""
+    base: dict[str, Any] = {
+        "model": "claude-haiku-4-5",
+        "messages": [{"role": "user", "content": "hi"}],
+    }
+    a = dict(base)
+    a["tools"] = [{"name": "Read", "description": "read", "input_schema": {}}]
+    b = dict(base)
+    b["tools"] = [{"name": "Write", "description": "write", "input_schema": {}}]
+    assert fingerprint(_body(a), endpoint=MESSAGES_ENDPOINT) != fingerprint(
+        _body(b), endpoint=MESSAGES_ENDPOINT
+    )

@@ -100,11 +100,19 @@ def _normalize_skills_list(text: str) -> str:
 def _normalize_claude_code_volatile(body: dict[str, Any]) -> dict[str, Any]:
     """Return a deep-copied body with Claude Code's volatile content rewritten.
 
-    Two known sources of drift:
+    Three known sources of drift:
     1. ``cch=<hex>`` cache marker inside the billing-header system block.
     2. Skill list ordering and truncation inside user-message text blocks.
+    3. The ``tools`` array — MCP tools are lazy-loaded and the set varies
+       between invocations. For Claude Code traffic the tools array is
+       auto-injected infrastructure, not part of the user's intent, so we
+       drop it from the fingerprint entirely. (Non-CC Anthropic traffic
+       keeps tools in the fingerprint — third-party apps register their
+       own tools and those do affect intended behavior.)
     """
     normalized: dict[str, Any] = json.loads(json.dumps(body))
+
+    normalized.pop("tools", None)
 
     sys_blocks = normalized.get("system")
     if isinstance(sys_blocks, list):
