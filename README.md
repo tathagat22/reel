@@ -265,7 +265,3 @@ CI runs lint, format check, type check (pyright strict), and the full test suite
 ## License
 
 [Apache 2.0](LICENSE) — use, fork, vendor, embed, ship.
-
----
-
-<sub>Tags: VCR for LLM APIs · OpenAI API testing · Anthropic API mock · Gemini API testing · pytest OpenAI plugin · VCR.py alternative · pytest-recording alternative · pytest-vcr alternative · respx alternative · free LLM API testing · offline LLM testing · deterministic LLM tests · LLM cost reduction in CI · record replay LLM API · SSE streaming mock · Ollama proxy · NVIDIA NIM proxy · Aider proxy · Claude Code cache · Cursor cache · opencode cache · llm cassette · OpenAI mock testing · Anthropic mock · python LLM testing</sub>
