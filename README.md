@@ -25,6 +25,29 @@ Cassettes are plain JSONL — you `grep` them, `jq` them, `git diff` them in PRs
 
 ---
 
+## See it in action — Claude Opus demo
+
+The same `claude -p` job run three times against three real markdown docs. **First run** records to disk and pays Anthropic for Opus tokens. **Runs 2 and 3** serve every call from the cassette in 2-3 ms and pay nothing.
+
+[![Opus demo — record once, replay free](docs/demos/opus-demo.gif)](docs/demos/opus-demo.mp4)
+
+Per-call latency in this run, straight from the proxy log:
+
+| Run | Call 1 | Call 2 | Call 3 |
+|---|---|---|---|
+| 1 (record) | 1865 ms | 1708 ms | 2183 ms |
+| 2 (replay) | **2 ms** | **2 ms** | **3 ms** |
+| 3 (replay) | **2 ms** | **2 ms** | **3 ms** |
+
+Output bytes are identical across all three runs. Cassette stays at 3 entries — replay never re-records. Reproduce it yourself:
+
+```bash
+git clone https://github.com/tathagat22/reel && cd reel
+./opus-demo.sh
+```
+
+---
+
 ## What Reel is
 
 A local HTTP proxy that sits between your code and the LLM provider. On the first call to a given prompt, Reel forwards the request upstream and writes the wire-level request/response pair to a JSONL "cassette" file. On every subsequent call with the same fingerprint, the cassette serves the recorded response from disk — about 250× faster than the network and ~$0 to your billing.

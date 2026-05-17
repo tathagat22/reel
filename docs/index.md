@@ -16,6 +16,24 @@ Reel is a local HTTP proxy that sits between your code and the LLM provider. On 
 
 ---
 
+## See it in action — Claude Opus demo
+
+The same `claude -p` job run three times against three real markdown docs. First run records and pays real Opus tokens. Runs 2 and 3 serve every call from disk in 2-3 ms and pay nothing.
+
+<video src="demos/opus-demo.mp4" controls muted loop playsinline preload="metadata" style="width:100%;max-width:900px;border-radius:8px;display:block;margin:1.5rem 0;"></video>
+
+Per-call latency in this exact run, from the proxy log:
+
+| Run | Call 1 | Call 2 | Call 3 |
+|---|---|---|---|
+| 1 (record) | 1865 ms | 1708 ms | 2183 ms |
+| 2 (replay) | **2 ms** | **2 ms** | **3 ms** |
+| 3 (replay) | **2 ms** | **2 ms** | **3 ms** |
+
+Output bytes are identical across runs. Cassette stays at 3 entries — replay never re-records. Reproduce locally with the bundled `opus-demo.sh` script.
+
+---
+
 ## Why this exists
 
 **LLM tests are flaky and expensive.** A pytest suite that calls `OpenAI().chat.completions.create(...)` in 40 tests bills real money on every CI run — multiply by every PR push, every retry, every contributor. With Reel: record once locally, commit the cassette, run CI with `pytest --reel-mode replay` for $0.
